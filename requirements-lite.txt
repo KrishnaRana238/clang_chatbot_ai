@@ -1,0 +1,14 @@
+# Lightweight version - installs faster (5-10 seconds)
+Django==5.0.6
+chainlit==1.0.505
+python-dotenv==1.0.0
+django-cors-headers==4.3.1
+djangorestframework==3.15.1
+requests==2.31.0
+
+# Optional: Add these for AI features (takes longer to install)
+# Uncomment the lines below if you want local AI models:
+# transformers==4.35.0
+# torch==2.1.0
+# accelerate==0.24.0
+# sentencepiece==0.1.99
