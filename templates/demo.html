@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clang AI - Enhanced Capabilities Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .capabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .capability-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 5px solid;
+        }
+
+        .capability-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .knowledge-base { border-left-color: #4CAF50; }
+        .nlp-processing { border-left-color: #2196F3; }
+        .math-solver { border-left-color: #FF9800; }
+        .grammar-checker { border-left-color: #9C27B0; }
+        .code-generator { border-left-color: #F44336; }
+        .conversational-ai { border-left-color: #00BCD4; }
+
+        .capability-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .capability-card .icon {
+            font-size: 1.8em;
+        }
+
+        .demo-section {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .demo-queries {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .query-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            transition: transform 0.2s ease;
+            text-align: left;
+        }
+
+        .query-button:hover {
+            transform: scale(1.02);
+        }
+
+        .chat-interface {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .input-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #query-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        #query-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        #send-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        #send-button:hover {
+            background: #5a67d8;
+        }
+
+        #send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .response-area {
+            background: white;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 150px;
+            white-space: pre-wrap;
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #f44336;
+            margin: 10px 0;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #4caf50;
+            margin: 10px 0;
+        }
+
+        .metadata {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .capabilities-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .demo-queries {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 Clang AI Enhanced</h1>
+            <p>Advanced AI Assistant with Comprehensive Knowledge & Capabilities</p>
+        </div>
+
+        <!-- Capabilities Overview -->
+        <div class="capabilities-grid">
+            <div class="capability-card knowledge-base">
+                <h3><span class="icon">🧠</span> Knowledge Base</h3>
+                <p>Comprehensive knowledge across programming, history, geography, politics, writing, mathematics, and science with intelligent search and context-aware responses.</p>
+            </div>
+
+            <div class="capability-card nlp-processing">
+                <h3><span class="icon">🔍</span> NLP Processing</h3>
+                <p>Advanced natural language understanding with sentiment analysis, intent recognition, entity extraction, and complexity assessment for intelligent responses.</p>
+            </div>
+
+            <div class="capability-card math-solver">
+                <h3><span class="icon">🔢</span> Mathematics Solver</h3>
+                <p>Solve equations, perform calculus operations (derivatives, integrals), algebra, and provide step-by-step mathematical solutions with symbolic computation.</p>
+            </div>
+
+            <div class="capability-card grammar-checker">
+                <h3><span class="icon">✍️</span> Writing Assistant</h3>
+                <p>Grammar checking, style analysis, paraphrasing, error correction, and writing improvement suggestions with comprehensive language support.</p>
+            </div>
+
+            <div class="capability-card code-generator">
+                <h3><span class="icon">💻</span> Code Generation</h3>
+                <p>Generate code in multiple programming languages, debug issues, explain algorithms, and provide programming best practices with detailed explanations.</p>
+            </div>
+
+            <div class="capability-card conversational-ai">
+                <h3><span class="icon">🗣️</span> Conversational AI</h3>
+                <p>Context-aware conversations with memory, personalized responses, and intelligent routing to appropriate specialized services based on query analysis.</p>
+            </div>
+        </div>
+
+        <!-- Interactive Demo -->
+        <div class="demo-section">
+            <h2>🎯 Interactive Demo</h2>
+            <p>Try these example queries or ask your own questions:</p>
+            
+            <div class="demo-queries">
+                {% for query in demo_queries %}
+                <button class="query-button" onclick="askQuery('{{ query|escapejs }}')">
+                    {{ query }}
+                </button>
+                {% endfor %}
+            </div>
+
+            <div class="chat-interface">
+                <h3>💬 Chat with Clang AI</h3>
+                <div class="input-section">
+                    <input type="text" id="query-input" placeholder="Ask me anything... (e.g., 'Solve x² + 5x + 6 = 0' or 'What is machine learning?')" maxlength="500">
+                    <button id="send-button" onclick="sendQuery()">Send</button>
+                </div>
+                <div id="response-area" class="response-area">
+                    Welcome! I'm Clang AI with enhanced capabilities. Ask me about:
+                    • 🧠 Knowledge topics (history, geography, science)
+                    • 🔢 Math problems and equations
+                    • 💻 Programming and code generation  
+                    • ✍️ Grammar checking and writing help
+                    • 🤖 General conversation and analysis
+                </div>
+            </div>
+        </div>
+
+        <!-- System Statistics -->
+        <div class="demo-section">
+            <h2>📊 System Statistics</h2>
+            <div class="stats-section" id="stats-section">
+                <div class="stat-card">
+                    <div class="stat-number" id="knowledge-items">--</div>
+                    <div>Knowledge Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="categories">--</div>
+                    <div>Categories</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="queries-processed">--</div>
+                    <div>Queries Processed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avg-confidence">--</div>
+                    <div>Avg Confidence</div>
+                </div>
+            </div>
+        </div>
+
+        {% if not has_enhanced_services %}
+        <div class="error">
+            <strong>⚠️ Enhanced Services Not Available</strong><br>
+            Some advanced features may not be accessible. Install required packages: spacy, textblob, nltk, sympy
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        let isProcessing = false;
+
+        function askQuery(query) {
+            document.getElementById('query-input').value = query;
+            sendQuery();
+        }
+
+        async function sendQuery() {
+            if (isProcessing) return;
+            
+            const input = document.getElementById('query-input');
+            const responseArea = document.getElementById('response-area');
+            const sendButton = document.getElementById('send-button');
+            
+            const query = input.value.trim();
+            if (!query) return;
+            
+            isProcessing = true;
+            sendButton.disabled = true;
+            sendButton.textContent = 'Processing...';
+            
+            responseArea.innerHTML = '<div class="loading">🔄 Processing your query...</div>';
+            
+            try {
+                const response = await fetch('/api/chat/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCookie('csrftoken')
+                    },
+                    body: JSON.stringify({ message: query })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Display response
+                let html = `<strong>You:</strong> ${query}\n\n`;
+                html += `<strong>Clang:</strong> ${data.bot_response.content}`;
+                
+                responseArea.innerHTML = html;
+                
+                // Clear input
+                input.value = '';
+                
+                // Load updated stats
+                loadSystemStats();
+                
+            } catch (error) {
+                responseArea.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+            } finally {
+                isProcessing = false;
+                sendButton.disabled = false;
+                sendButton.textContent = 'Send';
+            }
+        }
+
+        async function loadSystemStats() {
+            try {
+                const response = await fetch('/api/capabilities/');
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    document.getElementById('knowledge-items').textContent = 
+                        data.knowledge_base?.total_items || '--';
+                    document.getElementById('categories').textContent = 
+                        Object.keys(data.knowledge_base?.categories || {}).length;
+                    document.getElementById('queries-processed').textContent = 
+                        data.session_statistics?.queries_processed || '--';
+                    document.getElementById('avg-confidence').textContent = 
+                        (data.knowledge_base?.average_confidence || 0).toFixed(2);
+                }
+            } catch (error) {
+                console.log('Could not load system stats:', error);
+            }
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        // Handle Enter key
+        document.getElementById('query-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendQuery();
+            }
+        });
+
+        // Load initial stats
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSystemStats();
+        });
+    </script>
+</body>
+</html>

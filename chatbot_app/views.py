@@ -15,13 +15,22 @@ import json
 import os
 
 
-# Initialize chatbot service
+# Initialize chatbot service with enhanced capabilities
 try:
-    chatbot = OpenSourceChatbotService()
-    print(f"✅ Chatbot initialized successfully with method: {getattr(chatbot, 'method', 'unknown')}")
-except Exception as e:
-    chatbot = ChainlitChatbotService()
-    print(f"⚠️  Fallback to chainlit chatbot: {e}")
+    from .enhanced_clang_service import get_clang_response, enhanced_clang
+    chatbot = enhanced_clang
+    USE_ENHANCED_CLANG = True
+    print(f"✅ Enhanced Clang AI {enhanced_clang.version} initialized successfully")
+except ImportError as e:
+    print(f"⚠️  Enhanced Clang not available: {e}")
+    USE_ENHANCED_CLANG = False
+    try:
+        from .chatbot_service import OpenSourceChatbotService, ChainlitChatbotService
+        chatbot = OpenSourceChatbotService()
+        print(f"✅ Fallback chatbot initialized with method: {getattr(chatbot, 'method', 'unknown')}")
+    except Exception as e:
+        chatbot = ChainlitChatbotService()
+        print(f"⚠️  Final fallback to chainlit chatbot: {e}")
 
 
 def home(request):
@@ -87,9 +96,32 @@ class ChatView(APIView):
             else:
                 conversation_history = []
             
-            # Get bot response with better error handling
+            # Get bot response with enhanced capabilities
             try:
-                bot_response = asyncio.run(chatbot.get_response(message, conversation_history))
+                if USE_ENHANCED_CLANG:
+                    # Use enhanced Clang with full NLP and knowledge base
+                    loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(loop)
+                    try:
+                        enhanced_result = loop.run_until_complete(get_clang_response(message, conversation_history))
+                        bot_response = enhanced_result['response']
+                        
+                        # Add metadata for debugging (optional)
+                        if hasattr(request, 'GET') and request.GET.get('debug'):
+                            debug_info = f"\n\n🔍 **Debug Info:**\n"
+                            debug_info += f"• Intent: {enhanced_result['metadata'].get('intent', 'unknown')}\n"
+                            debug_info += f"• Confidence: {enhanced_result['metadata'].get('confidence', 0):.2f}\n"
+                            debug_info += f"• Capabilities Used: {', '.join(enhanced_result['metadata'].get('capabilities_activated', []))}\n"
+                            debug_info += f"• Processing Time: {enhanced_result['metadata'].get('processing_time_seconds', 0):.2f}s"
+                            bot_response += debug_info
+                    finally:
+                        loop.close()
+                else:
+                    # Fallback to basic chatbot (sync version)
+                    if hasattr(chatbot, 'get_response_sync'):
+                        bot_response = chatbot.get_response_sync(message, conversation_history)
+                    else:
+                        bot_response = "Hello! I'm Clang, your AI assistant. How can I help you today?"
                 
                 # Ensure we always have a valid response
                 if not bot_response or bot_response.strip() == "":
@@ -98,7 +130,7 @@ class ChatView(APIView):
             except Exception as e:
                 print(f"Error getting bot response: {e}")
                 # Provide a helpful fallback response
-                bot_response = "I'm Clang, and I'm experiencing some technical difficulties. Try asking me something simple like 'hello' or 'how are you?'"
+                bot_response = "I'm Clang, and I'm experiencing some technical difficulties. Try asking me something like 'what is Python programming?' or 'solve 2+2'."
             
             # Save bot response
             bot_message = ChatMessage.objects.create(

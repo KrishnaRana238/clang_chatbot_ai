@@ -85,7 +85,8 @@ class AdvancedLLMService:
             'complex': [
                 'evaluate', 'synthesize', 'critique', 'justify', 'argue',
                 'design', 'create', 'solve', 'optimize', 'predict',
-                'multistep', 'research', 'comprehensive'
+                'multistep', 'research', 'comprehensive', 'write', 'compose',
+                'generate', 'poem', 'story', 'essay', 'creative', 'invent'
             ]
         }
         
