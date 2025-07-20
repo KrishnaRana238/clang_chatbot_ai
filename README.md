@@ -30,7 +30,6 @@
 
 ## 🙏 Acknowledgments
 
-- **LangChain** - Advanced LLM orchestration
 - **OpenRouter** - Multi-model API access
 - **Cohere** - Enterprise AI models
 - **Chainlit** - Beautiful chat interface
