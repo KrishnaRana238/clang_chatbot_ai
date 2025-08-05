@@ -280,66 +280,16 @@
             background: #a8a8a8;
         }
 
-        /* Message reactions */
-        .message-reactions {
-            margin-top: 8px;
-            display: flex;
-            gap: 6px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .message:hover .message-reactions {
-            opacity: 1;
-        }
-
-        .reaction-btn {
-            background: none;
-            border: 1px solid #e0e0e0;
-            border-radius: 16px;
-            padding: 4px 8px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .reaction-btn:hover {
-            background: #f0f7ff;
-            border-color: #667eea;
-            transform: scale(1.1);
-        }
-
-        /* Character counter */
-        .char-counter {
-            position: absolute;
-            bottom: -25px;
-            right: 0;
-            font-size: 12px;
-            color: #666;
-            font-family: monospace;
-        }
-
-        /* Toast notifications */
-        .toast-notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #667eea;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            z-index: 2000;
-            font-weight: 500;
-        }
-
-        .toast-notification.show {
-            transform: translateX(0);
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .chat-container {
+                width: 95%;
+                height: 90vh;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
         }
     </style>
 </head>
@@ -482,10 +432,6 @@
                 const responseType = detectResponseType(content);
                 messageDiv.className += ` ${responseType}`;
                 messageDiv.innerHTML = formatResponse(content);
-                
-                // Add message reactions for bot messages
-                const reactionsDiv = addMessageReactions();
-                messageDiv.appendChild(reactionsDiv);
             } else {
                 messageDiv.textContent = content;
             }
@@ -558,161 +504,6 @@
             messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
         }
 
-        // Add message reactions
-        function addMessageReactions() {
-            const reactionsDiv = document.createElement('div');
-            reactionsDiv.className = 'message-reactions';
-            
-            const reactions = ['👍', '❤️', '😊', '📋', '🔗'];
-            
-            reactions.forEach(emoji => {
-                const btn = document.createElement('button');
-                btn.className = 'reaction-btn';
-                btn.innerHTML = emoji;
-                btn.title = getReactionTitle(emoji);
-                btn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    handleReaction(btn, emoji);
-                });
-                reactionsDiv.appendChild(btn);
-            });
-            
-            return reactionsDiv;
-        }
-
-        // Get reaction button titles
-        function getReactionTitle(emoji) {
-            const titles = {
-                '👍': 'Helpful',
-                '❤️': 'Love it',
-                '😊': 'Great response',
-                '📋': 'Copy message',
-                '🔗': 'Share'
-            };
-            return titles[emoji] || 'React';
-        }
-
-        // Handle message reactions
-        function handleReaction(btn, emoji) {
-            const messageElement = btn.closest('.message');
-            const messageContent = messageElement.querySelector('.message-content, .bot-message').textContent || messageElement.textContent;
-            
-            switch(emoji) {
-                case '👍':
-                case '❤️':
-                case '😊':
-                    // Visual feedback
-                    btn.style.background = '#f0f7ff';
-                    btn.style.borderColor = '#667eea';
-                    showToast(`Thanks for your ${emoji} reaction!`);
-                    sendFeedback('reaction', { emoji, messageContent });
-                    break;
-                case '📋':
-                    copyToClipboard(messageContent);
-                    showToast('Message copied to clipboard! 📋');
-                    break;
-                case '🔗':
-                    shareMessage(messageContent);
-                    break;
-            }
-        }
-
-        // Copy to clipboard
-        function copyToClipboard(text) {
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text);
-            } else {
-                // Fallback for older browsers
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-            }
-        }
-
-        // Share message
-        function shareMessage(content) {
-            if (navigator.share) {
-                navigator.share({
-                    title: 'Clang AI Response',
-                    text: content
-                });
-            } else {
-                copyToClipboard(content);
-                showToast('Message copied for sharing! 🔗');
-            }
-        }
-
-        // Show toast notifications
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = 'toast-notification';
-            toast.textContent = message;
-            
-            if (type === 'success') {
-                toast.style.background = '#22c55e';
-            } else if (type === 'error') {
-                toast.style.background = '#ef4444';
-            }
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    if (document.body.contains(toast)) {
-                        document.body.removeChild(toast);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // Send feedback to server
-        function sendFeedback(type, data) {
-            fetch('/api/feedback/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    feedback_type: type,
-                    session_id: currentSessionId,
-                    ...data
-                })
-            }).catch(error => {
-                console.log('Feedback not sent:', error);
-            });
-        }
-
-        // Character counter
-        function updateCharacterCounter() {
-            const currentLength = messageInput.value.length;
-            const maxLength = 1000;
-            
-            let counter = document.querySelector('.char-counter');
-            if (!counter) {
-                counter = document.createElement('div');
-                counter.className = 'char-counter';
-                document.querySelector('.chat-input').appendChild(counter);
-            }
-            
-            counter.textContent = `${currentLength}/${maxLength}`;
-            
-            if (currentLength > maxLength * 0.9) {
-                counter.style.color = '#ff5555';
-            } else if (currentLength > maxLength * 0.7) {
-                counter.style.color = '#f59e0b';
-            } else {
-                counter.style.color = '#666';
-            }
-        }
-
         // Event listeners
         if (sendButton) {
             sendButton.addEventListener('click', () => {
@@ -730,16 +521,12 @@
                 }
             });
 
-            messageInput.addEventListener('input', () => {
-                autoResizeTextarea();
-                updateCharacterCounter();
-            });
+            messageInput.addEventListener('input', autoResizeTextarea);
         }
 
         // Focus on input
         if (messageInput) {
             messageInput.focus();
-            updateCharacterCounter(); // Initialize character counter
         }
 
         console.log('Clang AI Chatbot initialized successfully!');

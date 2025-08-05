@@ -36,3 +36,26 @@ class ChatMessage(models.Model):
 
     class Meta:
         ordering = ['timestamp']
+
+
+class MessageFeedback(models.Model):
+    """Model to store user feedback on messages for UX analytics"""
+    REACTION_CHOICES = [
+        ('helpful', 'Helpful'),
+        ('not-helpful', 'Not Helpful'),
+        ('love', 'Love'),
+        ('copy', 'Copy'),
+        ('share', 'Share'),
+    ]
+
+    message_content = models.TextField(max_length=200)  # Truncated for privacy
+    reaction = models.CharField(max_length=20, choices=REACTION_CHOICES)
+    user_ip = models.GenericIPAddressField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    session_id = models.CharField(max_length=100, blank=True, null=True)
+    
+    def __str__(self):
+        return f"{self.reaction} - {self.message_content[:30]}..."
+    
+    class Meta:
+        ordering = ['-timestamp']

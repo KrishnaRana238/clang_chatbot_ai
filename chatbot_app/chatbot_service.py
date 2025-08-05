@@ -288,10 +288,10 @@ class OpenSourceChatbotService:
                     if not result.startswith("Error:"):
                         return f"🧮 Mathematical Result: {result}"
                     else:
-                        print(f"Math calculation error: {result}")
+                        print(f"❌ Math calculation error: {result}")
                         # Continue to AI providers if calculation fails
                 except Exception as e:
-                    print(f"Math parsing error: {e}")
+                    print(f"❌ Math parsing error: {e}")
                     # Continue to AI providers if parsing fails
             
             # Check for prime number queries
@@ -1464,8 +1464,10 @@ Thank you for helping improve Clang! Your feedback helps train better responses.
         
         # Check for simple math questions like "what is 2+2" or "calculate 15*8-10"
         if any(word in original_text.lower() for word in ['what is', 'calculate', 'what\'s', 'solve', 'compute']):
-            # Extract math from the question - be more flexible with spaces
-            math_part = re.search(r'[\d+\-*/(). ]+', original_text)
+            # Extract math from the question - be more flexible with spaces and punctuation
+            cleaned_text = original_text.replace('?', '').replace('!', '')
+            # Look for numbers and math symbols - simpler approach
+            math_part = re.search(r'(\d+(?:\.\d+)?[\s]*[+\-*/^][\s]*\d+(?:\.\d+)?(?:[\s]*[+\-*/^][\s]*\d+(?:\.\d+)?)*)', cleaned_text)
             if math_part:
                 math_text = math_part.group().replace(" ", "")
                 # Additional check for patterns with spaces
@@ -1552,8 +1554,9 @@ Thank you for helping improve Clang! Your feedback helps train better responses.
             
             # Handle questions like "what is 2+2" or "calculate 15 * 8 - 10"
             if any(word in expression.lower() for word in ['what is', 'calculate', 'what\'s', 'solve', 'compute']):
-                # More flexible regex to capture math expressions with spaces
-                math_match = re.search(r'[\d+\-*/().^*\s]+', expression)
+                # More flexible regex to capture math expressions with spaces and remove punctuation
+                clean_expr = expression.replace('?', '').replace('!', '').replace(',', '')
+                math_match = re.search(r'(\d+(?:\.\d+)?[\s]*[+\-*/^][\s]*\d+(?:\.\d+)?(?:[\s]*[+\-*/^][\s]*\d+(?:\.\d+)?)*)', clean_expr)
                 if math_match:
                     expression = math_match.group()
                     # Clean up the expression
@@ -1561,14 +1564,14 @@ Thank you for helping improve Clang! Your feedback helps train better responses.
             else:
                 expression = re.sub(r'\b(what is|what\'s|calculate|solve|compute)\b', '', expression.lower()).strip()
             
-            # Remove spaces and validate
-            expression = expression.replace(" ", "")
+            # Remove spaces and punctuation
+            expression = expression.replace(" ", "").replace("?", "").replace("!", "")
             
             # Convert ^ to ** for power operations
             expression = expression.replace("^", "**")
             
-            # Only allow safe characters
-            if not re.match(r'^[0-9+\-*/().^*]+$', expression):
+            # Only allow safe characters (including ** for power)
+            if not re.match(r'^[0-9+\-*/().]+$', expression):
                 raise ValueError("Invalid characters")
             
             # Evaluate safely (only basic math)

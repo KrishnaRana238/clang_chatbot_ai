@@ -132,6 +132,16 @@ class AdvancedNLPProcessor:
                 r"\b(proofread|edit|review)\s+",
                 r"is\s+this\s+(correct|right|proper)"
             ],
+            "medical_query": [
+                r"\b(symptom|disease|medication|drug|treatment|cure|medicine)",
+                r"\b(pain|fever|headache|nausea|vomiting|cough|cold|flu)",
+                r"\b(diabetes|hypertension|dengue|malaria|covid|infection)",
+                r"\b(antibiotic|paracetamol|aspirin|prescription|side\s+effect)",
+                r"\b(dosage|first\s+aid|emergency|doctor|hospital|medical)",
+                r"\b(health|illness|sick|hurt|injury|wound|bleeding)",
+                r"\b(tell\s+me\s+about|what\s+is)\s+.*(disease|condition|medication)",
+                r"\b(how\s+to\s+treat|cure\s+for|treatment\s+of)"
+            ],
             "explanation_request": [
                 r"\b(explain|describe|tell\s+me\s+about|what\s+is)",
                 r"\b(how\s+does|why\s+does|what\s+happens)",
@@ -537,6 +547,7 @@ async def process_user_query(query: str) -> Dict[str, Any]:
         'should_check_grammar': analysis.intent == 'grammar_check',
         'should_paraphrase': 'paraphrase' in query.lower() or 'rephrase' in query.lower(),
         'should_provide_code': analysis.intent == 'coding_request',
+        'should_provide_medical_info': analysis.intent == 'medical_query',
         'complexity_level': 'high' if analysis.complexity_score > 0.7 else 'medium' if analysis.complexity_score > 0.4 else 'low'
     }
     

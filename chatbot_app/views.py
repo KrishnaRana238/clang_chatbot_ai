@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import ChatSession, ChatMessage
+from .models import ChatSession, ChatMessage, MessageFeedback
 from .serializers import ChatSessionSerializer, ChatRequestSerializer, ChatMessageSerializer
 from .chatbot_service import OpenSourceChatbotService, ChainlitChatbotService
 import json
@@ -19,23 +19,29 @@ import os
 try:
     from .enhanced_clang_service import get_clang_response, enhanced_clang
     chatbot = enhanced_clang
-    USE_ENHANCED_CLANG = True
-    print(f"✅ Enhanced Clang AI {enhanced_clang.version} initialized successfully")
+    USE_ENHANCED_CLANG = False  # Temporarily disable to use fixed math processing
+    print(f"⚠️ Enhanced Clang available but using fallback for fixes")
 except ImportError as e:
     print(f"⚠️  Enhanced Clang not available: {e}")
     USE_ENHANCED_CLANG = False
-    try:
-        from .chatbot_service import OpenSourceChatbotService, ChainlitChatbotService
-        chatbot = OpenSourceChatbotService()
-        print(f"✅ Fallback chatbot initialized with method: {getattr(chatbot, 'method', 'unknown')}")
-    except Exception as e:
-        chatbot = ChainlitChatbotService()
-        print(f"⚠️  Final fallback to chainlit chatbot: {e}")
+
+try:
+    from .chatbot_service import OpenSourceChatbotService, ChainlitChatbotService
+    chatbot = OpenSourceChatbotService()
+    print(f"✅ Fallback chatbot initialized with method: {getattr(chatbot, 'method', 'unknown')}")
+except Exception as e:
+    chatbot = ChainlitChatbotService()
+    print(f"⚠️  Final fallback to chainlit chatbot: {e}")
 
 
 def home(request):
     """Home page view"""
     return render(request, 'chatbot_app/index.html')
+
+
+def simple_test(request):
+    """Simple test page view"""
+    return render(request, 'chatbot_app/simple_test.html')
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -117,11 +123,20 @@ class ChatView(APIView):
                     finally:
                         loop.close()
                 else:
-                    # Fallback to basic chatbot (sync version)
-                    if hasattr(chatbot, 'get_response_sync'):
-                        bot_response = chatbot.get_response_sync(message, conversation_history)
+                    # Use fixed OpenSourceChatbotService with math and medical capabilities
+                    if asyncio.iscoroutinefunction(chatbot.get_response):
+                        loop = asyncio.new_event_loop()
+                        asyncio.set_event_loop(loop)
+                        try:
+                            bot_response = loop.run_until_complete(chatbot.get_response(message, conversation_history))
+                        finally:
+                            loop.close()
                     else:
-                        bot_response = "Hello! I'm Clang, your AI assistant. How can I help you today?"
+                        # Fallback to sync version if available
+                        if hasattr(chatbot, 'get_response_sync'):
+                            bot_response = chatbot.get_response_sync(message, conversation_history)
+                        else:
+                            bot_response = f"I'm Clang! I can help with math, coding, and general questions. You asked: {message}"
                 
                 # Ensure we always have a valid response
                 if not bot_response or bot_response.strip() == "":
@@ -149,6 +164,84 @@ class ChatView(APIView):
             print(f"Unexpected error in ChatView: {e}")
             return Response(
                 {'error': 'An unexpected error occurred. Please try again.'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class FeedbackView(APIView):
+    """API view for handling user feedback on messages"""
+    
+    def post(self, request):
+        try:
+            if hasattr(request, 'data') and request.data:
+                data = request.data
+            else:
+                try:
+                    import json
+                    data = json.loads(request.body.decode('utf-8'))
+                except (json.JSONDecodeError, UnicodeDecodeError):
+                    return Response(
+                        {'error': 'Invalid JSON data'}, 
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            
+            message_content = data.get('message', '')
+            reaction = data.get('reaction', '')
+            timestamp = data.get('timestamp', '')
+            user_ip = request.META.get('REMOTE_ADDR', 'unknown')
+            
+            # Save feedback to database
+            try:
+                MessageFeedback.objects.create(
+                    message_content=message_content[:200],  # Truncate for privacy
+                    reaction=reaction,
+                    user_ip=user_ip,
+                    session_id=request.session.get('session_key', 'anonymous')
+                )
+            except Exception as e:
+                print(f"⚠️ Failed to save feedback: {e}")
+            
+            # Log feedback for analysis
+            feedback_data = {
+                'message': message_content[:100],  # Truncate for privacy
+                'reaction': reaction,
+                'timestamp': timestamp,
+                'user_ip': request.META.get('REMOTE_ADDR', 'unknown')
+            }
+            
+            print(f"📊 User Feedback: {feedback_data}")
+            
+            # If you have the human interaction system, you can use it here
+            if USE_ENHANCED_CLANG:
+                try:
+                    # Update user preferences based on feedback
+                    user_id = request.session.get('user_id', 'anonymous')
+                    
+                    if reaction in ['helpful', 'love']:
+                        # Positive feedback - learn from this interaction
+                        enhanced_clang.optimize_for_user(user_id, {
+                            'feedback_type': 'positive',
+                            'reaction': reaction,
+                            'message_sample': message_content[:50]
+                        })
+                    elif reaction == 'not-helpful':
+                        # Negative feedback - adjust approach
+                        enhanced_clang.optimize_for_user(user_id, {
+                            'feedback_type': 'negative',
+                            'reaction': reaction,
+                            'message_sample': message_content[:50]
+                        })
+                        
+                except Exception as e:
+                    print(f"⚠️ Feedback optimization failed: {e}")
+            
+            return Response({'status': 'success', 'message': 'Feedback received'})
+            
+        except Exception as e:
+            print(f"❌ Feedback error: {e}")
+            return Response(
+                {'error': 'Failed to process feedback'}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
