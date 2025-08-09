@@ -52,6 +52,10 @@ def handler(event, context):
                 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
             },
             'body': json.dumps({
+                'bot_response': {
+                    'content': response,
+                    'type': 'emotional'
+                },
                 'response': response,
                 'status': 'success'
             })

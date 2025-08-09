@@ -1,2 +1,0 @@
-# Netlify runtime.txt for Python version
-python-3.9

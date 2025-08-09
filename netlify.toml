@@ -1,9 +1,6 @@
 [build]
   publish = "templates"
-  command = "echo 'Static site with serverless functions ready'"
-
-[build.environment]
-  PYTHON_VERSION = "3.9"
+  command = "echo 'Build complete'"
 
 [[redirects]]
   from = "/api/chat/*"

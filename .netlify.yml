@@ -1,5 +1,0 @@
-# This file tells Netlify to ignore any Node.js detection
-# Force Python-only build
-[toolchain]
-node = false
-python = true
