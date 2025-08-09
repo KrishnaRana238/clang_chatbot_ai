@@ -18,8 +18,6 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            margin: 0;
-            padding: 10px;
         }
 
         .chat-container {
@@ -41,17 +39,6 @@
             text-align: center;
         }
 
-        .chat-header h1 {
-            font-size: 24px;
-            margin: 0;
-        }
-
-        .chat-header p {
-            margin: 5px 0;
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
         .session-info {
             font-size: 12px;
             color: rgba(255, 255, 255, 0.8);
@@ -63,7 +50,6 @@
             padding: 20px;
             overflow-y: auto;
             background: #fafafa;
-            scroll-behavior: smooth;
         }
 
         .message {
@@ -73,8 +59,6 @@
             max-width: 70%;
             word-wrap: break-word;
             animation: slideIn 0.3s ease-out;
-            position: relative;
-            line-height: 1.5;
         }
 
         @keyframes slideIn {
@@ -233,7 +217,7 @@
             border-top: 1px solid #eee;
             display: flex;
             gap: 10px;
-            align-items: flex-end;
+            position: relative;
         }
 
         #messageInput {
@@ -247,18 +231,12 @@
             min-height: 50px;
             max-height: 120px;
             overflow-y: auto;
-            transition: border-color 0.3s ease;
-            background: white;
-            color: #333;
-            line-height: 1.4;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         #messageInput:focus {
             border-color: #667eea;
-        }
-
-        #messageInput::placeholder {
-            color: #999;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
         #sendButton {
@@ -271,11 +249,9 @@
             font-weight: 600;
             transition: transform 0.2s, opacity 0.3s;
             white-space: nowrap;
-            font-size: 16px;
-            min-height: 50px;
         }
 
-        #sendButton:hover:not(:disabled) {
+        #sendButton:hover {
             transform: translateY(-2px);
         }
 
@@ -313,33 +289,6 @@
             
             .message {
                 max-width: 85%;
-                font-size: 0.9rem;
-            }
-
-            .chat-input {
-                padding: 15px;
-                gap: 8px;
-            }
-
-            #messageInput {
-                font-size: 16px; /* Prevents zoom on iOS */
-                border-radius: 20px;
-                padding: 12px 16px;
-            }
-
-            #sendButton {
-                padding: 12px 20px;
-                border-radius: 20px;
-                min-width: 60px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .message {
-                max-width: 90%;
-                margin-bottom: 12px;
-                padding: 10px 12px;
-                border-radius: 12px;
             }
         }
     </style>
@@ -348,7 +297,9 @@
     <div class="chat-container">
         <div class="chat-header">
             <h1>🤖 Clang AI</h1>
-            <p>Advanced AI with Medical, Math, Code & Knowledge Capabilities</p>
+            <p style="margin: 5px 0; font-size: 14px; opacity: 0.9;">
+                Advanced AI with Medical, Math, Code & Knowledge Capabilities
+            </p>
             <div class="session-info">Session: <span id="sessionId">New Session</span></div>
         </div>
         
@@ -382,7 +333,7 @@
     </div>
 
     <script>
-        // Simple, reliable chatbot interface
+        // Simple, working chatbot interface
         let currentSessionId = null;
         
         // Get DOM elements
@@ -392,16 +343,13 @@
         const typingIndicator = document.getElementById('typingIndicator');
         const sessionIdSpan = document.getElementById('sessionId');
 
-        console.log('Elements loaded successfully');
-
-        // Auto-resize textarea
-        function autoResizeTextarea() {
-            messageInput.style.height = 'auto';
-            messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
-        }
-
-        // Add event listener for auto-resize
-        messageInput.addEventListener('input', autoResizeTextarea);
+        console.log('Elements loaded:', {
+            chatMessages: !!chatMessages,
+            messageInput: !!messageInput,
+            sendButton: !!sendButton,
+            typingIndicator: !!typingIndicator,
+            sessionIdSpan: !!sessionIdSpan
+        });
 
         // Send message function
         async function sendMessage() {
@@ -425,8 +373,10 @@
             messageInput.style.height = 'auto';
 
             // Show typing indicator
-            typingIndicator.style.display = 'block';
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (typingIndicator) {
+                typingIndicator.style.display = 'block';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
 
             try {
                 const response = await fetch('/api/chat/', {
@@ -463,7 +413,9 @@
                 // Re-enable input
                 messageInput.disabled = false;
                 sendButton.disabled = false;
-                typingIndicator.style.display = 'none';
+                if (typingIndicator) {
+                    typingIndicator.style.display = 'none';
+                }
                 messageInput.focus();
             }
         }
@@ -476,6 +428,7 @@
             messageDiv.className = `message ${type}-message`;
             
             if (type === 'bot') {
+                // Apply enhanced styling based on content
                 const responseType = detectResponseType(content);
                 messageDiv.className += ` ${responseType}`;
                 messageDiv.innerHTML = formatResponse(content);
@@ -545,19 +498,38 @@
             return content;
         }
 
+        // Auto-resize textarea
+        function autoResizeTextarea() {
+            messageInput.style.height = 'auto';
+            messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
+        }
+
         // Event listeners
-        sendButton.addEventListener('click', sendMessage);
-
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
+        if (sendButton) {
+            sendButton.addEventListener('click', () => {
+                console.log('Send button clicked!');
                 sendMessage();
-            }
-        });
+            });
+        }
 
-        // Initialize
+        if (messageInput) {
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    console.log('Enter key pressed!');
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            messageInput.addEventListener('input', autoResizeTextarea);
+        }
+
+        // Focus on input
+        if (messageInput) {
+            messageInput.focus();
+        }
+
         console.log('Clang AI Chatbot initialized successfully!');
-        messageInput.focus();
     </script>
 </body>
 </html>

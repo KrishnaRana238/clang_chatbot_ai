@@ -2,6 +2,117 @@ import asyncio
 import signal
 from django.http import JsonResponse
 from django.shortcuts import render
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import ChatSession, ChatMessage
+from .serializers import ChatMessageSerializer
+from .chatbot_service import OpenSourceChatbotService, ChainlitChatbotService
+import json
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Import new services
+try:
+    from .advanced_medical_service import advanced_medical_service
+    MEDICAL_SERVICE_AVAILABLE = True
+    print("✅ Advanced Medical Service loaded")
+except ImportError as e:
+    print(f"⚠️ Advanced Medical Service not available: {e}")
+    MEDICAL_SERVICE_AVAILABLE = False
+
+try:
+    from .essay_writing_service import essay_writing_service
+    ESSAY_SERVICE_AVAILABLE = True
+    print("✅ Essay Writing Service loaded")
+except ImportError as e:
+    print(f"⚠️ Essay Writing Service not available: {e}")
+    ESSAY_SERVICE_AVAILABLE = False
+
+try:
+    from .emotional_intelligence_service import emotional_intelligence_service
+    EMOTIONAL_SERVICE_AVAILABLE = True
+    print("✅ Emotional Intelligence Service loaded")
+except ImportError as e:
+    print(f"⚠️ Emotional Intelligence Service not available: {e}")
+    EMOTIONAL_SERVICE_AVAILABLE = False
+
+# Enhanced Clang service integration
+try:
+    from .enhanced_clang_service import get_clang_response, enhanced_clang
+    chatbot = enhanced_clang
+    USE_ENHANCED_CLANG = True  # Enable enhanced Clang for real AI responses
+    print(f"✅ Enhanced Clang enabled for full AI responses")
+except ImportError as e:
+    print(f"⚠️  Enhanced Clang not available: {e}")
+    USE_ENHANCED_CLANG = False
+
+try:
+    from .chatbot_service import OpenSourceChatbotService, ChainlitChatbotService
+    fallback_chatbot = OpenSourceChatbotService()
+    print(f"✅ Fallback chatbot initialized with method: {fallback_chatbot.method}")
+except ImportError as e:
+    print(f"❌ Failed to initialize fallback chatbot: {e}")
+    fallback_chatbot = None
+
+class ChatAPIView(APIView):
+    """API view for chat interactions with optimized performance"""
+    
+    def get_trained_response(self, message):
+        """Handle specific trained responses for common queries"""
+        message_lower = message.lower().strip()
+        
+        # Name/Identity questions
+        if any(pattern in message_lower for pattern in [
+            'what is your name', "what's your name", 'who are you', 'what are you',
+            'tell me about yourself', 'introduce yourself', 'your name'
+        ]):
+            return """Hello! I'm **Clang**, your advanced AI assistant. I'm designed to help you with a wide range of tasks including medical queries, mathematical calculations, programming assistance, and general knowledge sharing. I can understand complex questions and provide detailed, accurate responses across multiple domains.
+
+*Created by Krishna* 🚀"""
+        
+        # Simple greetings
+        if message_lower in ['hey', 'hi', 'hello', 'good morning', 'good afternoon', 'good evening']:
+            return """Hey there! 👋 
+
+How can I help you today? I'm here to assist with:
+• Medical questions and health information
+• Mathematical calculations and problem solving  
+• Programming help and code assistance
+• General knowledge and research
+• Writing and creative tasks
+
+What would you like to explore?"""
+        
+        # No trained response found
+        return None
+        if any(pattern in message_lower for pattern in [
+            'what is your name', "what's your name", 'who are you', 'what are you',
+            'tell me about yourself', 'introduce yourself', 'your name'
+        ]):
+            return """Hello! I'm **Clang**, your advanced AI assistant. I'm designed to help you with a wide range of tasks including medical queries, mathematical calculations, programming assistance, and general knowledge sharing. I can understand complex questions and provide detailed, accurate responses across multiple domains.
+
+*Created by Krishna* 🚀"""
+        
+        # Simple greetings
+        if message_lower in ['hey', 'hi', 'hello', 'good morning', 'good afternoon', 'good evening']:
+            return """Hey there! 👋 
+
+How can I help you today? I'm here to assist with:
+• Medical questions and health information
+• Mathematical calculations and problem solving  
+• Programming help and code assistance
+• General knowledge and research
+• Writing and creative tasks
+
+What would you like to explore?"""
+        
+        # No trained response found
+        return None
+    
+    def get_optimized_response(self, message, conversation_history): JsonResponse
+from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.views import View
@@ -20,8 +131,8 @@ import os
 try:
     from .enhanced_clang_service import get_clang_response, enhanced_clang
     chatbot = enhanced_clang
-    USE_ENHANCED_CLANG = False  # Temporarily disable to use fixed math processing
-    print(f"⚠️ Enhanced Clang available but using fallback for fixes")
+    USE_ENHANCED_CLANG = True  # Enable enhanced Clang for real AI responses
+    print(f"✅ Enhanced Clang enabled for full AI responses")
 except ImportError as e:
     print(f"⚠️  Enhanced Clang not available: {e}")
     USE_ENHANCED_CLANG = False
@@ -48,6 +159,35 @@ def simple_test(request):
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatView(APIView):
     """API view for chat interactions with optimized performance"""
+    
+    def get_trained_response(self, message):
+        """Handle specific trained responses for common queries"""
+        message_lower = message.lower().strip()
+        
+        # Name/Identity questions
+        if any(pattern in message_lower for pattern in [
+            'what is your name', "what's your name", 'who are you', 'what are you',
+            'tell me about yourself', 'introduce yourself', 'your name'
+        ]):
+            return """Hello! I'm **Clang**, your advanced AI assistant. I'm designed to help you with a wide range of tasks including medical queries, mathematical calculations, programming assistance, and general knowledge sharing. I can understand complex questions and provide detailed, accurate responses across multiple domains.
+
+*Created by Krishna* 🚀"""
+        
+        # Simple greetings
+        if message_lower in ['hey', 'hi', 'hello', 'good morning', 'good afternoon', 'good evening']:
+            return """Hey there! 👋 
+
+How can I help you today? I'm here to assist with:
+• Medical questions and health information
+• Mathematical calculations and problem solving  
+• Programming help and code assistance
+• General knowledge and research
+• Writing and creative tasks
+
+What would you like to explore?"""
+        
+        # No trained response found
+        return None
     
     def get_optimized_response(self, message, conversation_history):
         """Get an optimized response using pattern matching and quick processing"""
@@ -654,24 +794,162 @@ Could you provide more specific details about what you'd like to know? I'm here 
 
 What interests you most?"""
     
-    def get_quick_fallback_response(self, message):
-        """Quick fallback for timeout situations"""
-        return f"""**Quick Response Mode** ⚡
+    def get_medical_response(self, message):
+        """Get medical response using the advanced medical service"""
+        if not MEDICAL_SERVICE_AVAILABLE:
+            return None
+            
+        try:
+            # Check if it's a medical query
+            message_lower = message.lower()
+            medical_keywords = [
+                'symptom', 'pain', 'medication', 'drug', 'medical', 'health', 
+                'doctor', 'hospital', 'disease', 'fever', 'headache', 'diabetes',
+                'asthma', 'anxiety', 'heart', 'blood', 'pressure', 'chest',
+                'emergency', 'allergy', 'migraine', 'arthritis', 'pneumonia'
+            ]
+            
+            if any(keyword in message_lower for keyword in medical_keywords):
+                response = advanced_medical_service.get_medical_response(message)
+                return response
+            return None
+        except Exception as e:
+            print(f"Error in medical response: {e}")
+            return None
+    
+    def get_essay_response(self, message):
+        """Get essay response using the essay writing service"""
+        if not ESSAY_SERVICE_AVAILABLE:
+            return None
+            
+        try:
+            # Check if it's an essay request
+            message_lower = message.lower()
+            essay_keywords = ['write an essay', 'essay on', 'essay about', 'write about']
+            
+            if any(keyword in message_lower for keyword in essay_keywords):
+                response = essay_writing_service.generate_essay(message)
+                return response
+            return None
+        except Exception as e:
+            print(f"Error in essay response: {e}")
+            return None
+    
+    def get_emotional_response(self, message):
+        """Get emotional and conversational response using emotional intelligence service"""
+        if not EMOTIONAL_SERVICE_AVAILABLE:
+            return None
+            
+        try:
+            # Check if it's a conversational/emotional message
+            if emotional_intelligence_service.is_conversational_message(message):
+                # Try casual conversation first
+                casual_response = emotional_intelligence_service.get_casual_response(message)
+                if casual_response:
+                    return casual_response
+                
+                # Try emotional response
+                emotional_response = emotional_intelligence_service.get_emotional_response(message)
+                if emotional_response:
+                    return emotional_response
+                
+                # Try empathetic response
+                empathetic_response = emotional_intelligence_service.get_empathetic_response(message)
+                if empathetic_response:
+                    return empathetic_response
+            
+            return None
+        except Exception as e:
+            print(f"Error in emotional response: {e}")
+            return None
+    
+    def get_intelligent_fallback_response(self, message):
+        """Provide an intelligent fallback response for any query"""
+        message_lower = message.lower().strip()
+        
+        # Categorize the query and provide relevant response
+        if any(word in message_lower for word in ['artificial intelligence', 'ai', 'machine learning', 'technology', 'computer', 'algorithm']):
+            return """**Artificial Intelligence Overview** 🤖
 
-I'm processing your request about: "{message[:100]}..."
+Artificial Intelligence (AI) refers to computer systems that can perform tasks typically requiring human intelligence. This includes:
 
-**I can help with:**
-• **Medical queries** (with safety disclaimers)
-• **Math calculations** (step-by-step solutions)  
-• **Programming help** (code, algorithms, debugging)
-• **General questions** (detailed explanations)
+**Key Areas:**
+• **Machine Learning** - Systems that learn from data
+• **Natural Language Processing** - Understanding human language
+• **Computer Vision** - Interpreting visual information
+• **Robotics** - Physical AI applications
 
-**For best results, try asking:**
-- Specific questions with clear context
-- One topic at a time
-- Include relevant details
+**Types of AI:**
+• **Narrow AI** - Specialized for specific tasks (current technology)
+• **General AI** - Human-level intelligence across domains (future goal)
 
-What specific aspect would you like me to focus on? I'm ready to provide detailed assistance!"""
+**Applications:**
+• Healthcare diagnostics and treatment
+• Autonomous vehicles and transportation
+• Financial analysis and fraud detection
+• Virtual assistants and chatbots
+• Content recommendation systems
+
+**Benefits & Considerations:**
+• Increased efficiency and automation
+• Enhanced decision-making capabilities
+• Potential job displacement concerns
+• Ethical considerations around privacy and bias
+
+AI continues to evolve rapidly, transforming industries and creating new possibilities for solving complex problems."""
+
+        elif any(word in message_lower for word in ['quantum', 'physics', 'science', 'computing']):
+            return """**Quantum Computing Explained** ⚛️
+
+Quantum computing harnesses quantum mechanical phenomena to process information in fundamentally different ways than classical computers.
+
+**Key Concepts:**
+• **Qubits** - Quantum bits that can exist in superposition (0, 1, or both)
+• **Superposition** - Qubits can represent multiple states simultaneously
+• **Entanglement** - Qubits can be correlated in quantum ways
+• **Quantum Interference** - Amplifying correct answers, canceling wrong ones
+
+**Advantages:**
+• Exponential speedup for certain problems
+• Superior for optimization and simulation
+• Breakthrough potential in cryptography
+• Revolutionary drug discovery capabilities
+
+**Current Applications:**
+• Cryptography and security
+• Financial modeling and risk analysis
+• Material science and chemistry
+• Machine learning optimization
+
+**Challenges:**
+• Quantum decoherence (fragile quantum states)
+• Error correction complexity
+• Limited practical implementations
+• Extremely cold operating requirements
+
+While still emerging, quantum computing promises to solve problems currently impossible for classical computers."""
+
+        else:
+            # General intelligent response
+            return f"""I understand you're asking about: **"{message}"**
+
+As Clang, your AI assistant, I'm designed to help with a wide range of topics including:
+
+🏥 **Medical & Health** - Symptoms, conditions, medications (with proper disclaimers)
+🔢 **Mathematics & Science** - Calculations, equations, scientific concepts  
+💻 **Technology & Programming** - Coding, algorithms, system design
+📚 **General Knowledge** - Research, explanations, analysis
+✍️ **Writing & Essays** - Content creation and academic assistance
+
+**How I can help:**
+• Provide detailed explanations on complex topics
+• Break down difficult concepts into understandable parts
+• Offer practical examples and applications
+• Include relevant context and background information
+
+Could you provide more specific details about what aspect interests you most? I'm here to give comprehensive, accurate assistance tailored to your needs!
+
+*Example: "Explain [specific topic]" or "Help me understand [concept]"*"""
     
     def post(self, request):
         try:
@@ -694,6 +972,25 @@ What specific aspect would you like me to focus on? I'm ready to provide detaile
             
             message = serializer.validated_data['message']
             session_id = serializer.validated_data.get('session_id')
+            
+            # Handle empty or whitespace-only messages
+            if not message or not message.strip():
+                return Response({
+                    'session_id': session_id or chatbot.generate_session_id(),
+                    'response': """Hello! 👋 
+
+I notice you didn't include a message. I'm Clang, your AI assistant, and I'm here to help with:
+
+🏥 **Medical Questions** - Health information with proper disclaimers
+🔢 **Mathematics** - Calculations and problem solving
+💻 **Programming** - Coding help and technical guidance
+📚 **General Knowledge** - Research and explanations
+✍️ **Essay Writing** - Content creation assistance
+
+Please feel free to ask me anything! What would you like to know or discuss?""",
+                    'user_message': None,
+                    'bot_response': None
+                }, status=status.HTTP_200_OK)
             
             # Create or get chat session
             if session_id:
@@ -727,54 +1024,74 @@ What specific aspect would you like me to focus on? I'm ready to provide detaile
             else:
                 conversation_history = []
             
-            # Get bot response with optimized performance
-            try:
-                # Set a shorter timeout for faster responses
-                import signal
-                
-                def timeout_handler(signum, frame):
-                    raise TimeoutError("Response generation timed out")
-                
-                # Set a 10-second timeout for response generation
-                signal.signal(signal.SIGALRM, timeout_handler)
-                signal.alarm(10)
-                
-                try:
-                    if USE_ENHANCED_CLANG:
-                        # Use enhanced Clang with full NLP and knowledge base
-                        loop = asyncio.new_event_loop()
-                        asyncio.set_event_loop(loop)
-                        try:
-                            enhanced_result = loop.run_until_complete(get_clang_response(message, conversation_history))
-                            bot_response = enhanced_result['response']
-                            
-                            # Add metadata for debugging (optional)
-                            if hasattr(request, 'GET') and request.GET.get('debug'):
-                                debug_info = f"\n\n🔍 **Debug Info:**\n"
-                                debug_info += f"• Intent: {enhanced_result['metadata'].get('intent', 'unknown')}\n"
-                                debug_info += f"• Confidence: {enhanced_result['metadata'].get('confidence', 0):.2f}\n"
-                                debug_info += f"• Capabilities Used: {', '.join(enhanced_result['metadata'].get('capabilities_activated', []))}\n"
-                                debug_info += f"• Processing Time: {enhanced_result['metadata'].get('processing_time_seconds', 0):.2f}s"
-                                bot_response += debug_info
-                        finally:
-                            loop.close()
+            # Check for trained responses first
+            trained_response = self.get_trained_response(message)
+            if trained_response:
+                bot_response = trained_response
+            else:
+                # Check for emotional/conversational response
+                emotional_response = self.get_emotional_response(message)
+                if emotional_response:
+                    bot_response = emotional_response
+                else:
+                    # Check for medical response
+                    medical_response = self.get_medical_response(message)
+                    if medical_response:
+                        bot_response = medical_response
                     else:
-                        # Use optimized fallback with quick pattern matching
-                        bot_response = self.get_optimized_response(message, conversation_history)
-                finally:
-                    signal.alarm(0)  # Cancel the alarm
-                
-                # Ensure we always have a valid response
-                if not bot_response or bot_response.strip() == "":
-                    bot_response = "Hello! I'm Clang, your AI assistant. Could you please rephrase your message?"
-                    
-            except TimeoutError:
-                print(f"Response generation timed out for message: {message[:50]}...")
-                bot_response = self.get_quick_fallback_response(message)
-            except Exception as e:
-                print(f"Error getting bot response: {e}")
-                # Provide a helpful fallback response
-                bot_response = self.get_quick_fallback_response(message)
+                        # Check for essay response
+                        essay_response = self.get_essay_response(message)
+                        if essay_response:
+                            bot_response = essay_response
+                        else:
+                            # Get bot response with AI processing (with timeout handling)
+                            try:
+                                if USE_ENHANCED_CLANG:
+                                    # Use enhanced Clang with timeout protection
+                                    import signal
+                                    from functools import wraps
+                                    
+                                    def timeout_handler(signum, frame):
+                                        raise TimeoutError("AI processing timeout")
+                                    
+                                    # Set timeout for AI processing (15 seconds max)
+                                    signal.signal(signal.SIGALRM, timeout_handler)
+                                    signal.alarm(15)
+                                    
+                                    try:
+                                        loop = asyncio.new_event_loop()
+                                        asyncio.set_event_loop(loop)
+                                        try:
+                                            enhanced_result = loop.run_until_complete(get_clang_response(message, conversation_history))
+                                            bot_response = enhanced_result['response']
+                                            
+                                            # Add metadata for debugging (optional)
+                                            if hasattr(request, 'GET') and request.GET.get('debug'):
+                                                debug_info = f"\n\n🔍 **Debug Info:**\n"
+                                                debug_info += f"• Intent: {enhanced_result['metadata'].get('intent', 'unknown')}\n"
+                                                debug_info += f"• Confidence: {enhanced_result['metadata'].get('confidence', 0):.2f}\n"
+                                                debug_info += f"• Capabilities Used: {', '.join(enhanced_result['metadata'].get('capabilities_activated', []))}\n"
+                                                debug_info += f"• Processing Time: {enhanced_result['metadata'].get('processing_time_seconds', 0):.2f}s"
+                                                bot_response += debug_info
+                                        finally:
+                                            loop.close()
+                                    except TimeoutError:
+                                        print("⚠️ AI processing timeout, using fallback")
+                                        bot_response = self.get_optimized_response(message, conversation_history)
+                                    finally:
+                                        signal.alarm(0)  # Cancel the alarm
+                                else:
+                                    # Use optimized fallback with quick pattern matching
+                                    bot_response = self.get_optimized_response(message, conversation_history)
+                                
+                                # Ensure we always have a valid response
+                                if not bot_response or bot_response.strip() == "":
+                                    bot_response = self.get_intelligent_fallback_response(message)
+                                    
+                            except Exception as e:
+                                print(f"Error getting bot response: {e}")
+                                # Provide an intelligent fallback response
+                                bot_response = self.get_intelligent_fallback_response(message)
             
             # Save bot response
             bot_message = ChatMessage.objects.create(

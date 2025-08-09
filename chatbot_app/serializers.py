@@ -21,5 +21,5 @@ class ChatSessionSerializer(serializers.ModelSerializer):
 
 
 class ChatRequestSerializer(serializers.Serializer):
-    message = serializers.CharField(max_length=5000)
+    message = serializers.CharField(max_length=5000, allow_blank=True)
     session_id = serializers.CharField(max_length=255, required=False)
