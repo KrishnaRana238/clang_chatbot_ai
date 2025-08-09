@@ -1,13 +1,19 @@
 [build]
   publish = "templates"
-  command = "./build.sh"
+  command = "pip install -r requirements-netlify.txt"
 
 [build.environment]
-  PYTHON_VERSION = "3.11"
+  PYTHON_VERSION = "3.9"
+  PIP_CACHE_DIR = "/opt/build/cache/pip"
+
+[[redirects]]
+  from = "/api/chat/*"
+  to = "/.netlify/functions/chat"
+  status = 200
 
 [[redirects]]
   from = "/api/*"
-  to = "/.netlify/functions/django/:splat"
+  to = "/.netlify/functions/chat"
   status = 200
 
 [[redirects]]

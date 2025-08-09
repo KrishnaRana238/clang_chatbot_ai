@@ -1,21 +1,21 @@
 import json
 import os
 import sys
-import django
-from django.conf import settings
-from django.core.wsgi import get_wsgi_application
-from django.http import JsonResponse
-from django.urls import resolve
-from django.core.handlers.wsgi import WSGIRequest
 
 # Add the project directory to Python path
 sys.path.insert(0, '/opt/build/repo')
 
-# Configure Django settings
+# Set Django settings before importing Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chatbot_project.settings')
 
-# Setup Django
-django.setup()
+try:
+    import django
+    from django.conf import settings
+    from django.core.wsgi import get_wsgi_application
+    django.setup()
+except ImportError:
+    # Fallback if Django import fails
+    pass
 
 def handler(event, context):
     """
