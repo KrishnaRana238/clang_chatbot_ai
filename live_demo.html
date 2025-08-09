@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Chatbot Capability Demo</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+        
+        .test-panel {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .chatbot-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .chatbot-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 18px;
+        }
+        
+        .chatbot-frame {
+            height: calc(100% - 60px);
+        }
+        
+        .chatbot-frame iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 22px;
+            text-align: center;
+        }
+        
+        .demo-section {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .demo-section h3 {
+            margin: 0 0 15px 0;
+            color: #4a5568;
+            font-size: 16px;
+        }
+        
+        .test-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .test-item:hover {
+            background: #f0f8ff;
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        }
+        
+        .test-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .test-prompt {
+            font-family: 'Monaco', 'Menlo', monospace;
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            margin: 8px 0;
+            line-height: 1.4;
+        }
+        
+        .test-expected {
+            color: #4a5568;
+            font-size: 12px;
+            font-style: italic;
+            margin-top: 8px;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .test-item:hover .copy-btn {
+            opacity: 1;
+        }
+        
+        .copy-btn:hover {
+            background: #5a67d8;
+        }
+        
+        .instructions {
+            background: #e6fffa;
+            border: 1px solid #38b2ac;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .instructions h4 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+            font-size: 14px;
+        }
+        
+        .instructions p {
+            margin: 0;
+            color: #4a5568;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .feature-highlight {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #48bb78;
+            display: inline-block;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .category-emoji {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        
+        .scroll-hint {
+            position: sticky;
+            bottom: 0;
+            background: linear-gradient(to top, white, transparent);
+            padding: 10px;
+            text-align: center;
+            font-size: 12px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="test-panel">
+            <h1>🎯 Live Demo Guide</h1>
+            
+            <div class="instructions">
+                <h4>🚀 How to Test:</h4>
+                <p>Click any test item to copy the prompt, then paste it into the chatbot on the right. Watch how Clang handles each scenario!</p>
+            </div>
+            
+            <div class="feature-highlight">
+                <span class="status-indicator"></span>
+                Performance Optimizations Active
+            </div>
+            
+            <div class="demo-section">
+                <h3><span class="category-emoji">🏥</span>Medical Expertise</h3>
+                
+                <div class="test-item" onclick="copyToClipboard('What are the interactions between warfarin and vitamin K? How does this affect INR levels?')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Advanced Drug Interactions</div>
+                    <div class="test-prompt">What are the interactions between warfarin and vitamin K? How does this affect INR levels?</div>
+                    <div class="test-expected">Expected: Detailed interaction analysis with medical disclaimers</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('I\\'m having severe chest pain, shortness of breath, and my left arm feels numb')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Emergency Response Protocol</div>
+                    <div class="test-prompt">I'm having severe chest pain, shortness of breath, and my left arm feels numb</div>
+                    <div class="test-expected">Expected: Immediate emergency guidance (call 911)</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('Explain Type 2 diabetes: causes, symptoms, management, and lifestyle modifications')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Comprehensive Medical Condition</div>
+                    <div class="test-prompt">Explain Type 2 diabetes: causes, symptoms, management, and lifestyle modifications</div>
+                    <div class="test-expected">Expected: Thorough medical overview with management strategies</div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h3><span class="category-emoji">🔢</span>Mathematical Prowess</h3>
+                
+                <div class="test-item" onclick="copyToClipboard('Calculate the integral of sin(x)cos(x) from 0 to π/2. Show your work step by step.')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Advanced Calculus</div>
+                    <div class="test-prompt">Calculate the integral of sin(x)cos(x) from 0 to π/2. Show your work step by step.</div>
+                    <div class="test-expected">Expected: Complete integration with mathematical steps</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('Solve x² - 5x + 6 = 0 using two different methods and verify your answers')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Multiple Solution Methods</div>
+                    <div class="test-prompt">Solve x² - 5x + 6 = 0 using two different methods and verify your answers</div>
+                    <div class="test-expected">Expected: Factoring + quadratic formula with verification</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('A ball is dropped from a 45-meter tall building. How long does it take to hit the ground? Use g = 9.8 m/s²')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Applied Physics Problem</div>
+                    <div class="test-prompt">A ball is dropped from a 45-meter tall building. How long does it take to hit the ground? Use g = 9.8 m/s²</div>
+                    <div class="test-expected">Expected: Physics equations with numerical solution</div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h3><span class="category-emoji">💻</span>Programming Excellence</h3>
+                
+                <div class="test-item" onclick="copyToClipboard('Implement a binary search algorithm in Python with error handling. Explain time complexity.')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Algorithm Implementation</div>
+                    <div class="test-prompt">Implement a binary search algorithm in Python with error handling. Explain time complexity.</div>
+                    <div class="test-expected">Expected: Complete code with complexity analysis</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('Review this code and suggest improvements:\\n\\ndef find_max(numbers):\\n    max_val = numbers[0]\\n    for i in range(len(numbers)):\\n        if numbers[i] > max_val:\\n            max_val = numbers[i]\\n    return max_val')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Code Review & Optimization</div>
+                    <div class="test-prompt">Review this code and suggest improvements:
+
+def find_max(numbers):
+    max_val = numbers[0]
+    for i in range(len(numbers)):
+        if numbers[i] > max_val:
+            max_val = numbers[i]
+    return max_val</div>
+                    <div class="test-expected">Expected: Optimization suggestions and best practices</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('Design a RESTful API for a library management system. Include endpoints, data models, and database schema.')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">System Architecture</div>
+                    <div class="test-prompt">Design a RESTful API for a library management system. Include endpoints, data models, and database schema.</div>
+                    <div class="test-expected">Expected: Complete API design with technical specifications</div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h3><span class="category-emoji">🧠</span>Contextual Intelligence</h3>
+                
+                <div class="test-item" onclick="copyToClipboard('I\\'m a software developer working on a medical app. What security considerations should I keep in mind?')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Context-Aware Consulting</div>
+                    <div class="test-prompt">I'm a software developer working on a medical app. What security considerations should I keep in mind?</div>
+                    <div class="test-expected">Expected: HIPAA compliance, encryption, security best practices</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('Remember that my name is Krishna and I\\'m testing your capabilities today')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Memory & Context Setting</div>
+                    <div class="test-prompt">Remember that my name is Krishna and I'm testing your capabilities today</div>
+                    <div class="test-expected">Expected: Acknowledgment and memory storage</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('What\\'s my name and what am I doing right now?')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Memory Recall Test</div>
+                    <div class="test-prompt">What's my name and what am I doing right now?</div>
+                    <div class="test-expected">Expected: Should recall "Krishna" and "testing capabilities"</div>
+                </div>
+            </div>
+            
+            <div class="demo-section">
+                <h3><span class="category-emoji">⚡</span>Performance Features</h3>
+                
+                <div class="test-item" onclick="sendRapidMessages()">
+                    <button class="copy-btn">Test</button>
+                    <div class="test-title">Rapid Message Handling</div>
+                    <div class="test-prompt">Click to send 5 quick test messages</div>
+                    <div class="test-expected">Expected: Smooth handling of rapid inputs</div>
+                </div>
+                
+                <div class="test-item" onclick="copyToClipboard('Explain quantum computing, its applications in cryptography, machine learning, and how it compares to classical computing methods in terms of computational complexity and practical limitations')">
+                    <button class="copy-btn">Copy</button>
+                    <div class="test-title">Complex Query Processing</div>
+                    <div class="test-prompt">Explain quantum computing, its applications in cryptography, machine learning, and how it compares to classical computing methods in terms of computational complexity and practical limitations</div>
+                    <div class="test-expected">Expected: Comprehensive response with virtual scrolling</div>
+                </div>
+            </div>
+            
+            <div class="scroll-hint">
+                Scroll up for more test scenarios ↑
+            </div>
+        </div>
+        
+        <div class="chatbot-container">
+            <div class="chatbot-header">
+                🤖 Clang AI Assistant - Live Testing Environment
+            </div>
+            <div class="chatbot-frame">
+                <iframe src="http://127.0.0.1:8000" id="chatbotFrame"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(function() {
+                // Show brief success indication
+                showToast('Prompt copied! Paste it in the chatbot →');
+            }, function(err) {
+                console.error('Could not copy text: ', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                showToast('Prompt copied! Paste it in the chatbot →');
+            });
+        }
+        
+        function sendRapidMessages() {
+            const messages = [
+                "What is 25 × 4?",
+                "Define artificial intelligence",
+                "What is Python programming?",
+                "Medical term: tachycardia",
+                "Explain bubble sort"
+            ];
+            
+            showToast('Sending 5 rapid messages to test performance...');
+            
+            // Send messages with small delays to test rapid handling
+            messages.forEach((message, index) => {
+                setTimeout(() => {
+                    copyToClipboard(message);
+                    if (index === messages.length - 1) {
+                        setTimeout(() => {
+                            showToast('All messages sent! Check chatbot performance →');
+                        }, 500);
+                    }
+                }, index * 800);
+            });
+        }
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #48bb78;
+                color: white;
+                padding: 12px 24px;
+                border-radius: 25px;
+                z-index: 10000;
+                font-weight: 600;
+                font-size: 14px;
+                box-shadow: 0 10px 25px rgba(72, 187, 120, 0.3);
+                opacity: 0;
+                transition: all 0.3s ease;
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Animate in
+            setTimeout(() => {
+                toast.style.opacity = '1';
+                toast.style.transform = 'translateX(-50%) translateY(0)';
+            }, 100);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(-50%) translateY(-20px)';
+                setTimeout(() => document.body.removeChild(toast), 300);
+            }, 3000);
+        }
+        
+        // Show welcome message
+        setTimeout(() => {
+            showToast('🎯 Click any test item to copy and test Clang\'s capabilities!');
+        }, 1000);
+    </script>
+</body>
+</html>
