@@ -1,0 +1,3 @@
+# Netlify build file to force Python detection
+echo "Building Python chatbot application..."
+echo "No Node.js build required"

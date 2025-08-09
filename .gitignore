@@ -8,6 +8,15 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+
+# Node.js (exclude to prevent Node.js detection by Netlify)
+node_modules/
+package-lock.json
+yarn.lock
+package.json
+
+# Netlify specific
+.netlify/
 build/
 develop-eggs/
 dist/

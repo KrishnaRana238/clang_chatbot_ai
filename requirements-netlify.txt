@@ -1,3 +1,1 @@
-# Minimal requirements for Netlify serverless functions
-# No Django needed for simple serverless function
-requests==2.31.0
+# No external dependencies needed for basic serverless function
