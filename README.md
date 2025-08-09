@@ -1,8 +1,28 @@
-# Clang AI Assistant - Advanced Multi-Provider Chatbot
+# Enhanced Clang AI Assistant - Advanced Multi-Provider Chatbot with Emotional Intelligence
 
-🤖 **Clang** is a sophisticated AI assistant built with Django multi-provider API integration and intelligent question complexity analysis.
+🤖 **Clang** is a sophisticated AI assistant built with Django multi-provider API integration, emotional intelligence, and human-like conversational abilities.
 
 ## 🚀 Key Features
+
+### 🧠 **Emotional Intelligence & Human Chit-Chat**
+- **Emotion Detection** - Recognizes happy, sad, angry, anxious, tired, confused states
+- **Empathetic Responses** - Caring, supportive responses with appropriate emojis
+- **Social Awareness** - Natural greetings, check-ins, and casual conversations
+- **Life Situation Support** - Understanding responses to relationship, work, family issues
+- **Time-Sensitive Greetings** - Morning, afternoon, evening, and bedtime interactions
+
+### 🏥 **Advanced Medical Expertise**
+- **Comprehensive Database** - 10+ medical conditions, 6+ medications
+- **Emergency Detection** - Identifies urgent medical situations
+- **Drug Interaction Checker** - Professional safety analysis
+- **Symptom Analysis** - Detailed condition matching with urgency levels
+- **Safety Protocols** - Proper medical disclaimers and professional consultation recommendations
+
+### ✍️ **Academic Essay Writing**
+- **12+ Topic Categories** - Technology, environment, education, health, etc.
+- **200-Word Optimization** - Precisely crafted essays within word limits
+- **Smart Categorization** - Automatic essay type and structure detection
+- **Quality Content** - Well-structured, informative academic writing
 
 ### 🌐 **Multi-Provider API Support**
 - **OpenRouter** - Access to GPT-4, Claude, and premium models
