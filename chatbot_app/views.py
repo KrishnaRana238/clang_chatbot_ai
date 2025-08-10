@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
@@ -1081,7 +1082,7 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                                             enhanced_result = loop.run_until_complete(
                                                 asyncio.wait_for(
                                                     get_clang_response(message, conversation_history),
-                                                    timeout=15.0  # 15 second timeout
+                                                    timeout=30.0  # 30 second timeout for essay writing
                                                 )
                                             )
                                             bot_response = enhanced_result['response']
@@ -1097,10 +1098,13 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                                         finally:
                                             loop.close()
                                     except asyncio.TimeoutError:
-                                        print("⚠️ AI processing timeout, using fallback")
+                                        print("⚠️ AI processing timeout (30s), using fallback")
+                                        logging.warning(f"Enhanced Clang timed out after 30s for message: {message[:100]}")
                                         bot_response = self.get_optimized_response(message, conversation_history)
                                     except Exception as ai_error:
-                                        print(f"⚠️ AI processing error: {ai_error}, using fallback")
+                                        print(f"⚠️ AI processing error: {type(ai_error).__name__}: {ai_error}, using fallback")
+                                        logging.error(f"Enhanced Clang error: {type(ai_error).__name__}: {ai_error}")
+                                        logging.error(f"Full traceback: {traceback.format_exc()}")
                                         bot_response = self.get_optimized_response(message, conversation_history)
                                 else:
                                     # Use optimized fallback with quick pattern matching
