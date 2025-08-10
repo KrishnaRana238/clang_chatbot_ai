@@ -1,0 +1,8 @@
+# Ultra minimal requirements for Render deployment
+Django==5.0.6
+gunicorn==21.2.0
+whitenoise==6.5.0
+djangorestframework==3.15.1
+django-cors-headers==4.3.1
+python-dotenv==1.0.0
+requests==2.31.0

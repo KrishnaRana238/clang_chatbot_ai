@@ -156,6 +156,20 @@ def simple_test(request):
     return render(request, 'chatbot_app/simple_test.html')
 
 
+def health_check(request):
+    """Health check endpoint for deployment"""
+    return JsonResponse({
+        'status': 'healthy',
+        'message': 'Clang AI Chatbot is running',
+        'services_loaded': {
+            'medical': MEDICAL_SERVICE_AVAILABLE,
+            'essay': ESSAY_SERVICE_AVAILABLE,
+            'emotional': EMOTIONAL_SERVICE_AVAILABLE,
+            'enhanced_clang': USE_ENHANCED_CLANG
+        }
+    })
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatView(APIView):
     """API view for chat interactions with optimized performance"""

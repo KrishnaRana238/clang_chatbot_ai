@@ -3,11 +3,12 @@ services:
     name: clang-ai-chatbot
     env: python
     plan: free
+    region: oregon
     buildCommand: ./build.sh
-    startCommand: gunicorn chatbot_project.wsgi:application --host 0.0.0.0 --port $PORT --workers 1 --timeout 120
+    startCommand: gunicorn chatbot_project.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 120
     envVars:
       - key: PYTHON_VERSION
-        value: 3.11.0
+        value: 3.11.9
       - key: DJANGO_SETTINGS_MODULE
         value: chatbot_project.settings
       - key: DEBUG

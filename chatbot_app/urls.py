@@ -1,11 +1,14 @@
 from django.urls import path
-from .views import ChatView, ChatSessionListView, ChatSessionDetailView, delete_session, home, FeedbackView, simple_test
+from .views import ChatView, ChatSessionListView, ChatSessionDetailView, delete_session, home, FeedbackView, simple_test, health_check
 from .admin_views import (
     system_capabilities, test_capabilities, analyze_text, 
     demo_interface, math_solver
 )
 
 urlpatterns = [
+    # Health check for deployment
+    path('health/', health_check, name='health_check'),
+    
     # Main chat interface
     path('', home, name='home'),
     path('test/', simple_test, name='simple_test'),
