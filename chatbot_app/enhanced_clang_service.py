@@ -205,8 +205,17 @@ class EnhancedClangChatbot:
         
         sources_used = []
         capabilities_activated = []
+        query_lower = query.lower()
         
-        # Handle mathematical queries
+        # PRIORITY 1: Handle programming queries with intelligent fallback FIRST
+        if any(keyword in query_lower for keyword in ['algorithm', 'code', 'programming', 'function', 'binary search', 'sorting', 'python', 'javascript', 'java', 'c++', 'implement', 'quicksort', 'debug', 'software']):
+            return self._get_intelligent_fallback(query, capabilities_activated + ['programming_help'])
+        
+        # PRIORITY 2: Handle math queries with intelligent fallback FIRST  
+        if any(keyword in query_lower for keyword in ['solve', 'calculate', 'derivative', 'integral', 'equation', 'x²', 'x^2', 'math', 'mathematics']):
+            return self._get_intelligent_fallback(query, capabilities_activated + ['math_solver'])
+        
+        # Handle mathematical queries (original logic)
         if strategy.get('should_calculate', False):
             self.session_stats['math_problems_solved'] += 1
             capabilities_activated.append('mathematical_solver')
