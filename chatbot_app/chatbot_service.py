@@ -98,20 +98,21 @@ class OpenSourceChatbotService:
                 'key': self.groq_key,
                 'models': ['llama3-8b-8192', 'llama3-70b-8192', 'mixtral-8x7b-32768']
             })
-        if self.mistral_key and HAS_MISTRAL:
-            self.providers.append({
-                'name': 'mistral',
-                'client': None,
-                'key': self.mistral_key,
-                'models': ['mistral-tiny', 'mistral-small', 'mistral-medium', 'mistral-large-latest']
-            })
-        if self.together_key and HAS_TOGETHER:
-            self.providers.append({
-                'name': 'together',
-                'client': None,
-                'key': self.together_key,
-                'models': ['meta-llama/Llama-2-70b-chat-hf', 'meta-llama/Meta-Llama-3-70B-Instruct', 'mistralai/Mixtral-8x7B-Instruct-v0.1', 'togethercomputer/RedPajama-INCITE-7B-Chat']
-            })
+        # Temporarily disable Mistral and Together due to production issues
+        # if self.mistral_key and HAS_MISTRAL:
+        #     self.providers.append({
+        #         'name': 'mistral',
+        #         'client': None,
+        #         'key': self.mistral_key,
+        #         'models': ['mistral-tiny', 'mistral-small', 'mistral-medium', 'mistral-large-latest']
+        #     })
+        # if self.together_key and HAS_TOGETHER:
+        #     self.providers.append({
+        #         'name': 'together',
+        #         'client': None,
+        #         'key': self.together_key,
+        #         'models': ['meta-llama/Llama-2-70b-chat-hf', 'meta-llama/Meta-Llama-3-70B-Instruct', 'mistralai/Mixtral-8x7B-Instruct-v0.1', 'togethercomputer/RedPajama-INCITE-7B-Chat']
+        #     })
         
         self.current_provider_index = 0  # Track which provider we're currently using
         
@@ -176,13 +177,14 @@ class OpenSourceChatbotService:
                     provider['client'] = Groq(api_key=provider['key'])
                     print(f"🔑 Groq API initialized")
                     
-                elif provider_name == 'mistral':
-                    provider['client'] = MistralClient(api_key=provider['key'])
-                    print(f"🔑 Mistral AI initialized")
+                # Temporarily disable problematic APIs
+                # elif provider_name == 'mistral':
+                #     provider['client'] = MistralClient(api_key=provider['key'])
+                #     print(f"🔑 Mistral AI initialized")
                     
-                elif provider_name == 'together':
-                    provider['client'] = Together(api_key=provider['key'])
-                    print(f"🔑 Together AI initialized")
+                # elif provider_name == 'together':
+                #     provider['client'] = Together(api_key=provider['key'])
+                #     print(f"🔑 Together AI initialized")
                     
                 return True
                 
