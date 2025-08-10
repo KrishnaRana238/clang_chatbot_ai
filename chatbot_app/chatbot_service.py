@@ -223,7 +223,12 @@ class OpenSourceChatbotService:
                     enhanced_response = await self.advanced_llm.generate_enhanced_response(
                         message, conversation_history
                     )
-                    return enhanced_response['response']
+                    # Ensure response is not None
+                    if enhanced_response and enhanced_response.get('response'):
+                        return enhanced_response['response']
+                    else:
+                        print("⚠️ Advanced LLM returned None or empty response, falling back")
+                        # Fall through to standard processing
             except Exception as e:
                 print(f"⚠️  Advanced LLM failed, falling back to standard processing: {e}")
         
@@ -686,7 +691,8 @@ class OpenSourceChatbotService:
                     for model, result in results.items():
                         model_name = model.split('/')[-1].replace(':free', '').replace('-', ' ').title()
                         status = "✅" if result['status'] == 'success' else "❌"
-                        response_text = result['response'][:150] + "..." if len(result['response']) > 150 else result['response']
+                        response_text = result.get('response', '') or ''  # Handle None response
+                        response_text = response_text[:150] + "..." if len(response_text) > 150 else response_text
                         response += f"{status} **{model_name}**: {response_text}\n\n"
                     return response
                 else:
@@ -935,7 +941,8 @@ class OpenSourceChatbotService:
                     for model, result in results.items():
                         model_name = model.split('/')[-1].replace(':free', '').title()
                         status = "✅" if result['status'] == 'success' else "❌"
-                        response += f"{status} **{model_name}**: {result['response'][:100]}{'...' if len(result['response']) > 100 else ''}\n\n"
+                        safe_response = result.get('response', '') or ''  # Handle None response
+                        response += f"{status} **{model_name}**: {safe_response[:100]}{'...' if len(safe_response) > 100 else ''}\n\n"
                     return response
             return "Model comparison requires OpenRouter API. Please set up your API key."
         
