@@ -3,8 +3,8 @@ services:
     name: clang-ai-chatbot
     env: python
     plan: free
-    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput
-    startCommand: gunicorn chatbot_project.wsgi:application --bind 0.0.0.0:$PORT
+    buildCommand: pip install -r requirements-minimal.txt && python manage.py collectstatic --noinput --clear
+    startCommand: gunicorn chatbot_project.wsgi:application --host 0.0.0.0 --port $PORT --workers 1
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
@@ -12,15 +12,5 @@ services:
         value: chatbot_project.settings
       - key: DEBUG
         value: false
-      - key: ALLOWED_HOSTS
-        value: ".onrender.com"
       - key: SECRET_KEY
         generateValue: true
-      - key: COHERE_API_KEY
-        sync: false
-      - key: GROQ_API_KEY
-        sync: false
-      - key: MISTRAL_API_KEY
-        sync: false
-      - key: TOGETHER_API_KEY
-        sync: false
