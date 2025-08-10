@@ -959,7 +959,11 @@ class OpenSourceChatbotService:
         ]
         
         if any(task in message_lower for task in complex_tasks):
-            return await self._handle_complex_task(message)
+            result = await self._handle_complex_task(message)
+            if result is None:
+                # Let enhanced AI handle it - return None to pass through
+                return None
+            return result
         
         # Knowledge base responses
         knowledge_responses = {
@@ -1024,12 +1028,17 @@ class OpenSourceChatbotService:
         else:
             return f"That's an interesting point about '{message}'. I'd love to hear more about what you're thinking or what specific information you're looking for!"
 
-    async def _handle_complex_task(self, message: str) -> str:
+    async def _handle_complex_task(self, message: str):
         """Handle complex tasks like coding, writing, etc."""
         message_lower = message.lower()
         
-        # Fallback to enhanced rule-based responses for complex tasks
-        if any(word in message_lower for word in ["write", "essay", "paragraph"]):
+        # For essay writing, return None to let enhanced AI handle it
+        if any(word in message_lower for word in ["write", "essay"]):
+            result = self._writing_assistance(message)
+            if result is None:
+                return None  # Let enhanced AI handle essay writing
+            return result
+        elif "paragraph" in message_lower:
             return self._writing_assistance(message)
         elif any(word in message_lower for word in ["code", "program", "function", "python", "javascript"]):
             return self._coding_assistance(message)
@@ -1038,23 +1047,11 @@ class OpenSourceChatbotService:
         else:
             return self._general_complex_assistance(message)
     
-    def _writing_assistance(self, message: str) -> str:
-        """Provide writing assistance"""
+    def _writing_assistance(self, message: str):
+        """Provide writing assistance - delegate to enhanced AI for actual content creation"""
         if "essay" in message.lower():
-            return """I can help you structure an essay! Here's a basic framework:
-
-📝 **Essay Structure:**
-1. **Introduction** - Hook, background, thesis statement
-2. **Body Paragraphs** - Each with topic sentence, evidence, analysis
-3. **Conclusion** - Restate thesis, summarize key points
-
-**Tips:**
-- Start with an outline
-- Use transitions between paragraphs
-- Support claims with evidence
-- Revise and proofread
-
-What topic are you writing about? I can provide more specific guidance!"""
+            # For essay requests, return None to let enhanced AI handle it
+            return None
         
         elif "paragraph" in message.lower():
             return """Here's how to write a strong paragraph:
