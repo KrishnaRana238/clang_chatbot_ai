@@ -276,8 +276,12 @@ What would you like to explore?"""
             return self.handle_medical_query(message)
         
         # Programming queries
-        if any(term in message_lower for term in ['python', 'code', 'programming', 'algorithm', 'function', 'debug', 'api', 'database']):
+        if any(term in message_lower for term in ['python', 'code', 'programming', 'algorithm', 'function', 'debug', 'api', 'database', 'binary search', 'sorting']):
             return self.handle_programming_query(message)
+        
+        # Science queries - Add this new section
+        if any(term in message_lower for term in ['quantum', 'physics', 'science', 'explain', 'theory', 'scientific', 'chemistry', 'biology']):
+            return self.handle_science_query(message)
         
         # Greeting and introduction
         if any(term in message_lower for term in ['hello', 'hi', 'hey', 'name', 'who are you', 'what are you']):
@@ -769,6 +773,50 @@ I was created by **Krishna** to provide comprehensive assistance across multiple
 - Mobile-responsive design
 
 I'm designed to provide accurate, helpful, and safe assistance. What would you like to explore today?"""
+    
+    def handle_science_query(self, message):
+        """Handle science-related queries with detailed explanations"""
+        return """**Science & Physics Explained** 🔬
+
+Your science question touches on fascinating principles! Let me provide a comprehensive explanation:
+
+**Quantum Computing Fundamentals:**
+
+**Classical vs Quantum Bits:**
+• **Classical Bits**: Store either 0 or 1
+• **Quantum Bits (Qubits)**: Can exist in superposition (both 0 and 1 simultaneously)
+• **Entanglement**: Qubits can be mysteriously connected across distances
+
+**Quantum Algorithms:**
+```python
+# Quantum Superposition Simulation
+def quantum_superposition():
+    # A qubit in superposition
+    qubit_state = [0.707, 0.707]  # √(1/2), √(1/2)
+    probability_0 = qubit_state[0]**2  # 50%
+    probability_1 = qubit_state[1]**2  # 50%
+    return "Qubit measures as 0 or 1 with equal probability"
+```
+
+**Physics Applications:**
+• **Cryptography**: Quantum key distribution (unbreakable encryption)
+• **Drug Discovery**: Molecular simulation at quantum level
+• **Optimization**: Solving complex logistics problems
+• **Machine Learning**: Quantum neural networks
+
+**Real-World Examples:**
+• **GPS Systems**: Rely on Einstein's relativity corrections
+• **MRI Machines**: Use quantum nuclear magnetic resonance
+• **Semiconductor Technology**: Based on quantum mechanics
+• **Laser Technology**: Quantum light amplification
+
+**Current Research:**
+• **Quantum Supremacy**: Google's 53-qubit Sycamore processor
+• **Quantum Internet**: Ultra-secure communication networks
+• **Quantum Sensors**: Detecting gravitational waves
+• **Quantum Chemistry**: Understanding photosynthesis
+
+What specific aspect of science would you like to explore deeper?"""
     
     def handle_capabilities_query(self):
         """Handle questions about capabilities"""
