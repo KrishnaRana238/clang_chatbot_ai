@@ -1,5 +1,4 @@
 import asyncio
-import signal
 from django.http import JsonResponse
 from django.shortcuts import render
 from rest_framework.views import APIView
@@ -210,6 +209,11 @@ What would you like to explore?"""
         from datetime import datetime
         
         message_lower = message.lower().strip()
+        
+        # Skip optimization for creative writing requests - let enhanced AI handle these
+        creative_keywords = ['write an essay', 'essay on', 'essay about', 'write about', 'write a', 'compose', 'create', 'poem', 'story', 'creative', 'fiction']
+        if any(keyword in message_lower for keyword in creative_keywords):
+            return None
         
         # Quick math calculations
         if any(op in message for op in ['+', '-', '*', '/', '=', 'calculate', 'solve']):
@@ -814,8 +818,14 @@ What interests you most?"""
             return None
             
         try:
-            # Check if it's a medical query
+            # Skip medical processing for essay/creative writing requests
             message_lower = message.lower()
+            creative_keywords = ['write an essay', 'essay on', 'essay about', 'write about', 'write a', 'compose', 'create', 'poem', 'story', 'creative', 'fiction']
+            
+            if any(keyword in message_lower for keyword in creative_keywords):
+                return None
+            
+            # Check if it's a medical query
             medical_keywords = [
                 'symptom', 'pain', 'medication', 'drug', 'medical', 'health', 
                 'doctor', 'hospital', 'disease', 'fever', 'headache', 'diabetes',
@@ -833,21 +843,15 @@ What interests you most?"""
     
     def get_essay_response(self, message):
         """Get essay response using the essay writing service"""
-        if not ESSAY_SERVICE_AVAILABLE:
+        # For essay requests, we want to use the full AI instead of templates
+        # Check if it's an essay request but DON'T generate template response
+        message_lower = message.lower()
+        essay_keywords = ['write an essay', 'essay on', 'essay about', 'write about', 'write a', 'compose']
+        
+        if any(keyword in message_lower for keyword in essay_keywords):
+            # Return None to force it to use the enhanced AI service
             return None
-            
-        try:
-            # Check if it's an essay request
-            message_lower = message.lower()
-            essay_keywords = ['write an essay', 'essay on', 'essay about', 'write about']
-            
-            if any(keyword in message_lower for keyword in essay_keywords):
-                response = essay_writing_service.generate_essay(message)
-                return response
-            return None
-        except Exception as e:
-            print(f"Error in essay response: {e}")
-            return None
+        return None
     
     def get_emotional_response(self, message):
         """Get emotional and conversational response using emotional intelligence service"""
@@ -855,6 +859,13 @@ What interests you most?"""
             return None
             
         try:
+            # Skip emotional processing for essay/creative writing requests
+            message_lower = message.lower()
+            creative_keywords = ['write an essay', 'essay on', 'essay about', 'write about', 'write a', 'compose', 'create', 'poem', 'story']
+            
+            if any(keyword in message_lower for keyword in creative_keywords):
+                return None
+            
             # Check if it's a conversational/emotional message
             if emotional_intelligence_service.is_conversational_message(message):
                 # Try casual conversation first
@@ -1058,25 +1069,21 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                         if essay_response:
                             bot_response = essay_response
                         else:
-                            # Get bot response with AI processing (with timeout handling)
+                            # Get bot response with AI processing (with asyncio timeout handling)
                             try:
                                 if USE_ENHANCED_CLANG:
-                                    # Use enhanced Clang with timeout protection
-                                    import signal
-                                    from functools import wraps
-                                    
-                                    def timeout_handler(signum, frame):
-                                        raise TimeoutError("AI processing timeout")
-                                    
-                                    # Set timeout for AI processing (15 seconds max)
-                                    signal.signal(signal.SIGALRM, timeout_handler)
-                                    signal.alarm(15)
-                                    
+                                    # Use enhanced Clang with asyncio timeout protection
                                     try:
                                         loop = asyncio.new_event_loop()
                                         asyncio.set_event_loop(loop)
                                         try:
-                                            enhanced_result = loop.run_until_complete(get_clang_response(message, conversation_history))
+                                            # Use asyncio timeout instead of signal (thread-safe)
+                                            enhanced_result = loop.run_until_complete(
+                                                asyncio.wait_for(
+                                                    get_clang_response(message, conversation_history),
+                                                    timeout=15.0  # 15 second timeout
+                                                )
+                                            )
                                             bot_response = enhanced_result['response']
                                             
                                             # Add metadata for debugging (optional)
@@ -1089,11 +1096,12 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                                                 bot_response += debug_info
                                         finally:
                                             loop.close()
-                                    except TimeoutError:
+                                    except asyncio.TimeoutError:
                                         print("⚠️ AI processing timeout, using fallback")
                                         bot_response = self.get_optimized_response(message, conversation_history)
-                                    finally:
-                                        signal.alarm(0)  # Cancel the alarm
+                                    except Exception as ai_error:
+                                        print(f"⚠️ AI processing error: {ai_error}, using fallback")
+                                        bot_response = self.get_optimized_response(message, conversation_history)
                                 else:
                                     # Use optimized fallback with quick pattern matching
                                     bot_response = self.get_optimized_response(message, conversation_history)
