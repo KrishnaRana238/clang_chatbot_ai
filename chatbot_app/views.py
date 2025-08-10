@@ -170,6 +170,57 @@ def health_check(request):
     })
 
 
+def api_test(request):
+    """Test all API providers in production"""
+    import os
+    results = {}
+    
+    # Test environment variables
+    results['env_vars'] = {
+        'COHERE_API_KEY': bool(os.getenv('COHERE_API_KEY')),
+        'GROQ_API_KEY': bool(os.getenv('GROQ_API_KEY')),
+        'MISTRAL_API_KEY': bool(os.getenv('MISTRAL_API_KEY')),
+        'TOGETHER_API_KEY': bool(os.getenv('TOGETHER_API_KEY')),
+        'OPENROUTER_API_KEY': bool(os.getenv('OPENROUTER_API_KEY')),
+    }
+    
+    # Test Cohere
+    try:
+        import cohere
+        cohere_key = os.getenv('COHERE_API_KEY')
+        if cohere_key:
+            client = cohere.Client(api_key=cohere_key)
+            response = client.generate(
+                model='command',
+                prompt='Hello',
+                max_tokens=5
+            )
+            results['cohere'] = {'status': 'success', 'response': str(response.generations[0].text)[:50]}
+        else:
+            results['cohere'] = {'status': 'missing_key'}
+    except Exception as e:
+        results['cohere'] = {'status': 'error', 'error': str(e)[:100]}
+    
+    # Test Groq
+    try:
+        from groq import Groq
+        groq_key = os.getenv('GROQ_API_KEY')
+        if groq_key:
+            client = Groq(api_key=groq_key)
+            response = client.chat.completions.create(
+                messages=[{"role": "user", "content": "Hello"}],
+                model="llama3-8b-8192",
+                max_tokens=5
+            )
+            results['groq'] = {'status': 'success', 'response': response.choices[0].message.content[:50]}
+        else:
+            results['groq'] = {'status': 'missing_key'}
+    except Exception as e:
+        results['groq'] = {'status': 'error', 'error': str(e)[:100]}
+    
+    return JsonResponse(results)
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class ChatView(APIView):
     """API view for chat interactions with optimized performance"""

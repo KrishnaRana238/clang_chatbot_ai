@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import ChatView, ChatSessionListView, ChatSessionDetailView, delete_session, home, FeedbackView, simple_test, health_check
+from .views import ChatView, ChatSessionListView, ChatSessionDetailView, delete_session, home, FeedbackView, simple_test, health_check, api_test
 from .admin_views import (
     system_capabilities, test_capabilities, analyze_text, 
     demo_interface, math_solver
@@ -8,6 +8,7 @@ from .admin_views import (
 urlpatterns = [
     # Health check for deployment
     path('health/', health_check, name='health_check'),
+    path('api-test/', api_test, name='api_test'),
     
     # Main chat interface
     path('', home, name='home'),
