@@ -337,12 +337,21 @@ class EnhancedClangChatbot:
             llm_response = await self.base_chatbot.get_response(query, history)
             sources_used.append('multi_api_llm')
             
-            return {
-                'response': llm_response,
-                'sources': sources_used,
-                'capabilities': capabilities_activated,
-                'type': 'general_conversation'
-            }
+            # Check if response is valid
+            if llm_response and llm_response.strip():
+                return {
+                    'response': llm_response,
+                    'sources': sources_used,
+                    'capabilities': capabilities_activated,
+                    'type': 'general_conversation'
+                }
+            else:
+                return {
+                    'response': "I'm having trouble generating a response right now. Could you please try rephrasing your question?",
+                    'sources': ['fallback'],
+                    'capabilities': ['basic_response'],
+                    'type': 'fallback'
+                }
         else:
             # Absolute fallback
             return {
@@ -356,6 +365,9 @@ class EnhancedClangChatbot:
         """Add Clang's personality and helpful context to responses"""
         
         base_response = response_data['response']
+        if base_response is None:
+            base_response = "I encountered an issue while processing your request. Let me try a different approach."
+        
         response_type = response_data.get('type', 'general')
         
         # Add personality based on response type
