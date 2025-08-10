@@ -12,18 +12,32 @@ echo "📋 Environment Configuration:"
 echo "   Django Settings: $DJANGO_SETTINGS_MODULE"
 echo "   Debug Mode: $DEBUG"
 echo "   Port: $PORT"
+echo "   Python Path: $(which python)"
+echo "   Pip Path: $(which pip)"
 
-# Check if gunicorn is available
-if ! command -v gunicorn &> /dev/null; then
-    echo "❌ Error: gunicorn not found. Installing..."
-    pip install gunicorn
+# Upgrade pip first
+echo "📦 Upgrading pip..."
+python -m pip install --upgrade pip
+
+# Install all dependencies from requirements.txt
+echo "📦 Installing all dependencies from requirements.txt..."
+if [ -f "requirements.txt" ]; then
+    python -m pip install -r requirements.txt
+else
+    echo "❌ requirements.txt not found!"
+    exit 1
 fi
 
-# Check if required packages are installed
-echo "📦 Checking dependencies..."
-python -c "import django, requests, gunicorn" 2>/dev/null || {
-    echo "⚠️  Installing missing dependencies..."
-    pip install -r requirements.txt
+# Verify critical imports
+echo "� Verifying installations..."
+python -c "import django; print(f'✅ Django {django.get_version()} is available')" || {
+    echo "❌ Django import failed!"
+    exit 1
+}
+
+python -c "import gunicorn; print('✅ Gunicorn is available')" || {
+    echo "❌ Gunicorn import failed!"
+    exit 1
 }
 
 # Run database migrations
@@ -36,7 +50,7 @@ python manage.py collectstatic --noinput
 
 # Start gunicorn server
 echo "🌐 Starting Gunicorn server on port $PORT..."
-exec gunicorn chatbot_project.wsgi:application \
+exec python -m gunicorn chatbot_project.wsgi:application \
     --bind 0.0.0.0:${PORT:-8000} \
     --workers 2 \
     --worker-class sync \
