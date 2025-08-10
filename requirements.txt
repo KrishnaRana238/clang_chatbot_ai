@@ -3,6 +3,7 @@ Django==5.0.6
 djangorestframework==3.15.1
 django-cors-headers==4.3.1
 python-dotenv==1.0.0
+gunicorn==21.2.0
 
 # Chainlit UI
 chainlit==1.0.505
