@@ -1147,9 +1147,11 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                                             
                                             bot_response = enhanced_result['response']
                                             
-                                            # Ensure response is not None
+                                            # Ensure response is not None - if it is, the enhanced service should have provided a fallback
                                             if not bot_response:
-                                                bot_response = "I'm having trouble generating a response. Let me try a different approach."
+                                                # This shouldn't happen with the new intelligent fallback system
+                                                # but keep as safety net
+                                                bot_response = self.get_intelligent_fallback_response(message)
                                             
                                             # Add metadata for debugging (optional)
                                             if hasattr(request, 'GET') and request.GET.get('debug'):
