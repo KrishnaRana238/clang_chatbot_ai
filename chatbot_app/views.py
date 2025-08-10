@@ -1087,6 +1087,10 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                                             )
                                             bot_response = enhanced_result['response']
                                             
+                                            # Ensure response is not None
+                                            if not bot_response:
+                                                bot_response = "I'm having trouble generating a response. Let me try a different approach."
+                                            
                                             # Add metadata for debugging (optional)
                                             if hasattr(request, 'GET') and request.GET.get('debug'):
                                                 debug_info = f"\n\n🔍 **Debug Info:**\n"
@@ -1094,7 +1098,8 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                                                 debug_info += f"• Confidence: {enhanced_result['metadata'].get('confidence', 0):.2f}\n"
                                                 debug_info += f"• Capabilities Used: {', '.join(enhanced_result['metadata'].get('capabilities_activated', []))}\n"
                                                 debug_info += f"• Processing Time: {enhanced_result['metadata'].get('processing_time_seconds', 0):.2f}s"
-                                                bot_response += debug_info
+                                                if bot_response:  # Check if bot_response is not None
+                                                    bot_response += debug_info
                                         finally:
                                             loop.close()
                                     except asyncio.TimeoutError:
