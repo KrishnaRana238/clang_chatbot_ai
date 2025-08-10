@@ -1078,6 +1078,8 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                                         loop = asyncio.new_event_loop()
                                         asyncio.set_event_loop(loop)
                                         try:
+                                            print(f"🔍 Calling Enhanced Clang for: {message[:50]}...")
+                                            
                                             # Use asyncio timeout instead of signal (thread-safe)
                                             enhanced_result = loop.run_until_complete(
                                                 asyncio.wait_for(
@@ -1085,6 +1087,13 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
                                                     timeout=30.0  # 30 second timeout for essay writing
                                                 )
                                             )
+                                            
+                                            print(f"✅ Enhanced Clang returned: {type(enhanced_result)}")
+                                            if enhanced_result and 'response' in enhanced_result:
+                                                print(f"✅ Response type: {type(enhanced_result['response'])}")
+                                            else:
+                                                print("⚠️ Enhanced result missing response key")
+                                            
                                             bot_response = enhanced_result['response']
                                             
                                             # Ensure response is not None
