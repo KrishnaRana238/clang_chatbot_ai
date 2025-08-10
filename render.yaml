@@ -3,8 +3,8 @@ services:
     name: clang-ai-chatbot
     env: python
     plan: free
-    buildCommand: pip install -r requirements-minimal.txt && python manage.py collectstatic --noinput --clear
-    startCommand: gunicorn chatbot_project.wsgi:application --host 0.0.0.0 --port $PORT --workers 1
+    buildCommand: ./build.sh
+    startCommand: gunicorn chatbot_project.wsgi:application --host 0.0.0.0 --port $PORT --workers 1 --timeout 120
     envVars:
       - key: PYTHON_VERSION
         value: 3.11.0
