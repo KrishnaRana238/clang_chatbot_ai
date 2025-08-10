@@ -1,2 +1,0 @@
-# Minimal dependencies for Netlify serverless function
-requests==2.31.0
