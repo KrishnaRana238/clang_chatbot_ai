@@ -1,0 +1,14 @@
+# Ignore Python dependencies that shouldn't be installed in static build
+requirements.txt
+chatbot_app/
+db.sqlite3
+manage.py
+*.pyc
+__pycache__/
+venv/
+env/
+.env
+
+# Only include what we need for static deployment
+!templates/
+!netlify/

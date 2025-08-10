@@ -1,6 +1,7 @@
 [build]
   publish = "templates"
-  command = "echo 'Build complete'"
+  command = "echo 'Static build complete - no dependencies needed'"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ."
 
 [[redirects]]
   from = "/api/chat/*"
@@ -19,3 +20,6 @@
 
 [functions]
   directory = "netlify/functions"
+  
+[build.environment]
+  SKIP_INSTALL = "true"
