@@ -1296,16 +1296,16 @@ What creative project can I help you with?"""
         query_lower = query.lower()
         
         # 🎯 PRIORITY: Handle specific acronyms and abbreviations FIRST
-        acronym_patterns = [
-            r'full form\s*(?:of\s+)?',  # "full form" or "full form of"
-            r'abbreviation',
-            r'acronym', 
-            r'stands for',
-            r'what does.*stand',
-            r'meaning of'
+        # Multiple pattern variations to catch all forms of acronym questions
+        acronym_phrases = [
+            'full form', 'full form of', 'full form of the', 'what is the full form',
+            'abbreviation', 'abbreviation of', 'abbreviation for',
+            'acronym', 'acronym for', 'acronym of',
+            'stands for', 'stand for', 'what does', 'what do',
+            'meaning of', 'means', 'definition of'
         ]
         
-        if any(re.search(pattern, query_lower) for pattern in acronym_patterns):
+        if any(phrase in query_lower for phrase in acronym_phrases):
             return self._handle_acronym_questions(query)
         
         # 🎯 ENHANCED ACCURACY: More precise keyword matching for better routing
