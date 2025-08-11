@@ -1294,6 +1294,10 @@ What creative project can I help you with?"""
         """Generate comprehensive, accurate responses for ANY question - Enhanced Universal Knowledge System"""
         query_lower = query.lower()
         
+        # 🎯 PRIORITY: Handle specific acronyms and abbreviations FIRST
+        if any(phrase in query_lower for phrase in ['full form', 'abbreviation', 'acronym', 'stands for', 'what does', 'meaning of']):
+            return self._handle_acronym_questions(query)
+        
         # 🎯 ENHANCED ACCURACY: More precise keyword matching for better routing
         
         # � BIOLOGY & LIFE SCIENCES (Enhanced Detection)
@@ -2690,6 +2694,319 @@ Your question about **{query}** relates to important AI concepts:
 - **Future development** potential
 
 **Would you like me to dive deeper into any specific AI aspect?**"""
+
+    def _handle_acronym_questions(self, query: str) -> str:
+        """Handle specific acronym and abbreviation questions with direct answers"""
+        query_lower = query.lower()
+        
+        # Common technology acronyms
+        if 'www' in query_lower:
+            return """# WWW - World Wide Web
+
+## Full Form
+**WWW** stands for **World Wide Web**
+
+## What is the World Wide Web?
+The **World Wide Web** (WWW) is an information system that enables documents and other web resources to be accessed over the Internet.
+
+## Key Components
+
+### 1. Web Pages
+- **HTML documents** containing text, images, and multimedia
+- **Hyperlinks** connecting different pages
+- **URLs** (Uniform Resource Locators) as addresses
+
+### 2. Web Browsers
+- **Software applications** for accessing web content
+- **Examples:** Chrome, Firefox, Safari, Edge
+- **Render HTML** and display web pages
+
+### 3. Web Servers
+- **Computers** that store and serve web pages
+- **HTTP/HTTPS protocols** for communication
+- **24/7 availability** for global access
+
+## History
+- **Invented by:** Tim Berners-Lee at CERN
+- **Year:** 1989-1990
+- **First website:** http://info.cern.ch/hypertext/WWW/TheProject.html
+- **Public release:** 1991
+
+## How WWW Works
+1. **User enters URL** in browser
+2. **Browser sends HTTP request** to web server
+3. **Server processes request** and sends HTML response
+4. **Browser renders** and displays the web page
+5. **User can click links** to navigate to other pages
+
+## Impact
+- **Revolutionized communication** and information sharing
+- **Enabled e-commerce** and online businesses  
+- **Created the modern internet** as we know it
+- **Connected the world** through instant information access
+
+## WWW vs Internet
+- **Internet:** The physical network infrastructure
+- **WWW:** The information system that runs on the Internet
+- **Analogy:** Internet is like roads, WWW is like the traffic
+
+The World Wide Web transformed how we access and share information globally."""
+
+        elif 'html' in query_lower:
+            return """# HTML - HyperText Markup Language
+
+## Full Form
+**HTML** stands for **HyperText Markup Language**
+
+## What is HTML?
+**HTML** is the standard markup language used to create and structure web pages and web applications.
+
+## Key Features
+- **Markup Language:** Uses tags to define elements
+- **Structure:** Organizes content hierarchically  
+- **Hypertext:** Supports links between documents
+- **Platform Independent:** Works across all devices
+
+## Basic HTML Structure
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Page Title</title>
+</head>
+<body>
+    <h1>Main Heading</h1>
+    <p>This is a paragraph.</p>
+    <a href="https://example.com">This is a link</a>
+</body>
+</html>
+```
+
+## Common HTML Elements
+- **Headings:** `<h1>` to `<h6>`
+- **Paragraphs:** `<p>`
+- **Links:** `<a href="">`
+- **Images:** `<img src="">`
+- **Lists:** `<ul>`, `<ol>`, `<li>`
+- **Divisions:** `<div>`, `<span>`
+
+## HTML Evolution
+- **HTML 1.0:** Basic structure (1993)
+- **HTML 4.01:** Standard for years (1999)
+- **XHTML:** XML-based version (2000)
+- **HTML5:** Current standard with multimedia support (2014)
+
+HTML is the foundation of all web development."""
+
+        elif 'css' in query_lower:
+            return """# CSS - Cascading Style Sheets
+
+## Full Form
+**CSS** stands for **Cascading Style Sheets**
+
+## What is CSS?
+**CSS** is a style sheet language used to describe the presentation and formatting of HTML documents.
+
+## Purpose
+- **Styling:** Colors, fonts, layouts
+- **Responsive Design:** Adapt to different screen sizes
+- **Animation:** Create interactive effects
+- **Separation:** Keep content (HTML) separate from presentation (CSS)
+
+## CSS Syntax
+```css
+selector {
+    property: value;
+    property: value;
+}
+
+h1 {
+    color: blue;
+    font-size: 24px;
+    text-align: center;
+}
+```
+
+## Types of CSS
+1. **Inline CSS:** Style directly in HTML element
+2. **Internal CSS:** Style within `<style>` tags in HTML
+3. **External CSS:** Separate .css file linked to HTML
+
+## Key Concepts
+- **Selectors:** Target HTML elements to style
+- **Properties:** What aspect to style (color, size, etc.)
+- **Values:** How to style it (red, 16px, center, etc.)
+- **Cascading:** Multiple styles can apply, priority rules exist
+
+CSS makes websites visually appealing and user-friendly."""
+
+        elif 'http' in query_lower:
+            return """# HTTP - HyperText Transfer Protocol
+
+## Full Form
+**HTTP** stands for **HyperText Transfer Protocol**
+
+## What is HTTP?
+**HTTP** is the foundation protocol used for transferring web pages and data over the Internet.
+
+## How HTTP Works
+1. **Client (browser) sends request** to server
+2. **Server processes request**
+3. **Server sends response** back to client
+4. **Client receives and displays** content
+
+## HTTP Methods
+- **GET:** Retrieve data from server
+- **POST:** Send data to server
+- **PUT:** Update existing data
+- **DELETE:** Remove data
+- **HEAD:** Get headers only
+
+## HTTP Status Codes
+- **200:** OK - Success
+- **404:** Not Found - Page doesn't exist
+- **500:** Internal Server Error
+- **301:** Moved Permanently - Redirect
+
+## HTTPS vs HTTP
+- **HTTP:** Standard protocol (not secure)
+- **HTTPS:** HTTP Secure with SSL/TLS encryption
+- **Security:** HTTPS protects data during transmission
+- **Modern Standard:** Most websites now use HTTPS
+
+HTTP enables all web communication and data transfer."""
+
+        elif 'url' in query_lower:
+            return """# URL - Uniform Resource Locator
+
+## Full Form
+**URL** stands for **Uniform Resource Locator**
+
+## What is a URL?
+A **URL** is the address used to access resources (web pages, files, etc.) on the Internet.
+
+## URL Structure
+```
+https://www.example.com:80/path/to/page?param=value#section
+```
+
+### Components:
+1. **Protocol:** `https://` (how to access)
+2. **Domain:** `www.example.com` (where to find)
+3. **Port:** `:80` (optional, which service)
+4. **Path:** `/path/to/page` (specific resource)
+5. **Query:** `?param=value` (parameters)
+6. **Fragment:** `#section` (specific part of page)
+
+## Common Protocols
+- **http://** - Standard web protocol
+- **https://** - Secure web protocol
+- **ftp://** - File transfer protocol
+- **mailto:** - Email addresses
+
+## Examples
+- **Website:** https://www.google.com
+- **Search:** https://www.google.com/search?q=example
+- **Email:** mailto:someone@example.com
+
+URLs are the universal addressing system of the Internet."""
+
+        # Add more common acronyms
+        elif any(acronym in query_lower for acronym in ['api', 'rest api']):
+            return """# API - Application Programming Interface
+
+## Full Form
+**API** stands for **Application Programming Interface**
+
+## What is an API?
+An **API** is a set of rules and protocols that allows different software applications to communicate with each other.
+
+## Key Concepts
+- **Interface:** Defines how components interact
+- **Requests:** How to ask for data or services
+- **Responses:** How data is returned
+- **Endpoints:** Specific URLs for different functions
+
+## Types of APIs
+- **REST API:** Uses HTTP methods (GET, POST, PUT, DELETE)
+- **GraphQL:** Query language for APIs
+- **SOAP:** Protocol for web services
+- **WebSocket:** Real-time communication
+
+## How APIs Work
+1. **Application makes request** to API endpoint
+2. **API processes request** and accesses data
+3. **API returns response** (usually JSON format)
+4. **Application uses** the returned data
+
+## Examples
+- **Weather API:** Get weather data for any location
+- **Payment API:** Process credit card transactions
+- **Social Media API:** Post to Twitter, Facebook
+- **Maps API:** Display maps and directions
+
+APIs enable modern software integration and functionality."""
+
+        elif 'ai' in query_lower and ('artificial intelligence' in query_lower or 'full form' in query_lower):
+            return """# AI - Artificial Intelligence
+
+## Full Form
+**AI** stands for **Artificial Intelligence**
+
+## What is Artificial Intelligence?
+**Artificial Intelligence** is the simulation of human intelligence in machines that are programmed to think and learn like humans.
+
+## Key Characteristics
+- **Learning:** Ability to improve from experience
+- **Reasoning:** Logical problem-solving capabilities
+- **Perception:** Understanding and interpreting data
+- **Decision Making:** Choosing optimal actions
+
+## Types of AI
+- **Narrow AI:** Task-specific intelligence (current)
+- **General AI:** Human-level intelligence (future goal)
+- **Superintelligence:** Beyond human intelligence (theoretical)
+
+## Applications
+- **Machine Learning:** Pattern recognition in data
+- **Natural Language Processing:** Understanding human language
+- **Computer Vision:** Interpreting visual information
+- **Robotics:** Intelligent physical systems
+
+AI is transforming every industry and aspect of modern life."""
+
+        # General acronym handler for unrecognized ones
+        else:
+            return f"""# Acronym/Abbreviation Explanation
+
+## Your Question: {query}
+
+I understand you're asking about the full form or meaning of an acronym or abbreviation.
+
+## Common Technology Acronyms I Can Explain:
+- **WWW** - World Wide Web
+- **HTML** - HyperText Markup Language
+- **CSS** - Cascading Style Sheets  
+- **HTTP/HTTPS** - HyperText Transfer Protocol (Secure)
+- **URL** - Uniform Resource Locator
+- **API** - Application Programming Interface
+- **AI** - Artificial Intelligence
+- **ML** - Machine Learning
+- **SQL** - Structured Query Language
+- **JSON** - JavaScript Object Notation
+
+## Other Common Acronyms:
+- **CEO** - Chief Executive Officer
+- **GDP** - Gross Domestic Product
+- **DNA** - Deoxyribonucleic Acid
+- **GPS** - Global Positioning System
+- **USB** - Universal Serial Bus
+
+Could you specify which acronym you're asking about? I can provide a detailed explanation with the full form, meaning, and relevant context.
+
+**Example:** "What is the full form of HTML?" or "What does API stand for?"
+
+What specific acronym would you like me to explain?"""
 
     def _generate_detailed_history_response(self, query: str) -> str:
         """Generate accurate historical responses"""
