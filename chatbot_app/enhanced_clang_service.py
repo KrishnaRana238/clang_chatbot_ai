@@ -5,6 +5,7 @@ Comprehensive AI assistant with NLP, knowledge base, math, and grammar capabilit
 
 import os
 import asyncio
+import re
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 import json
@@ -1295,7 +1296,6 @@ What creative project can I help you with?"""
         query_lower = query.lower()
         
         # 🎯 PRIORITY: Handle specific acronyms and abbreviations FIRST
-        import re
         acronym_patterns = [
             r'full form\s*(?:of\s+)?',  # "full form" or "full form of"
             r'abbreviation',
