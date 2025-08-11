@@ -1295,6 +1295,10 @@ What creative project can I help you with?"""
         """Generate comprehensive, accurate responses for ANY question - Enhanced Universal Knowledge System"""
         query_lower = query.lower()
         
+        # DEBUG: Print query for debugging
+        print(f"🔍 DEBUG: Processing query: '{query}'")
+        print(f"🔍 DEBUG: Lowercase query: '{query_lower}'")
+        
         # 🎯 PRIORITY: Handle specific acronyms and abbreviations FIRST
         # Multiple pattern variations to catch all forms of acronym questions
         acronym_phrases = [
@@ -1305,8 +1309,15 @@ What creative project can I help you with?"""
             'meaning of', 'means', 'definition of'
         ]
         
+        # DEBUG: Check acronym detection
+        matching_phrases = [phrase for phrase in acronym_phrases if phrase in query_lower]
+        print(f"🔍 DEBUG: Matching acronym phrases: {matching_phrases}")
+        
         if any(phrase in query_lower for phrase in acronym_phrases):
+            print(f"🔍 DEBUG: Acronym detected! Calling _handle_acronym_questions")
             return self._handle_acronym_questions(query)
+        else:
+            print(f"🔍 DEBUG: No acronym detected, continuing with regular processing")
         
         # 🎯 ENHANCED ACCURACY: More precise keyword matching for better routing
         
