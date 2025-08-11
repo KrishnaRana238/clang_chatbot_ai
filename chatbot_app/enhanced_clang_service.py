@@ -1295,7 +1295,7 @@ What creative project can I help you with?"""
         query_lower = query.lower()
         
         # 🎯 PRIORITY: Handle specific acronyms and abbreviations FIRST
-        if any(phrase in query_lower for phrase in ['full form', 'abbreviation', 'acronym', 'stands for', 'what does', 'meaning of']):
+        if any(phrase in query_lower for phrase in ['full form', 'full form of', 'abbreviation', 'acronym', 'stands for', 'what does', 'meaning of']):
             return self._handle_acronym_questions(query)
         
         # 🎯 ENHANCED ACCURACY: More precise keyword matching for better routing
