@@ -784,6 +784,90 @@ def partition(arr, low, high):
 - **Cache-efficient** (good locality of reference)
 - **Practical performance** often beats other O(n log n) algorithms"""
         
+        elif any(phrase in query_lower for phrase in ['python function', 'sort a list', 'sort list', 'python sort']):
+            return """# Python List Sorting Functions
+
+## Built-in Sorting Methods
+
+### 1. Using sorted() Function
+```python
+def sort_list_builtin(numbers):
+    \"\"\"Sort a list using Python's built-in sorted() function\"\"\"
+    return sorted(numbers)
+
+# Example usage
+original_list = [64, 34, 25, 12, 22, 11, 90]
+sorted_list = sort_list_builtin(original_list)
+print(f"Original: {original_list}")
+print(f"Sorted: {sorted_list}")
+```
+
+### 2. Using list.sort() Method (In-place)
+```python
+def sort_list_inplace(numbers):
+    \"\"\"Sort a list in-place using the sort() method\"\"\"
+    numbers.sort()
+    return numbers
+
+# Example usage
+my_list = [64, 34, 25, 12, 22, 11, 90]
+sort_list_inplace(my_list)
+print(f"Sorted in-place: {my_list}")
+```
+
+### 3. Custom Sorting Functions
+
+#### Bubble Sort Implementation
+```python
+def bubble_sort(arr):
+    \"\"\"Implement bubble sort algorithm\"\"\"
+    n = len(arr)
+    for i in range(n):
+        # Track if any swaps were made
+        swapped = False
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        # If no swaps, list is sorted
+        if not swapped:
+            break
+    return arr
+```
+
+#### Insertion Sort Implementation
+```python
+def insertion_sort(arr):
+    \"\"\"Implement insertion sort algorithm\"\"\"
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        # Move elements greater than key one position ahead
+        while j >= 0 and arr[j] > key:
+            arr[j + 1] = arr[j]
+            j -= 1
+        arr[j + 1] = key
+    return arr
+```
+
+### 4. Advanced Sorting Options
+```python
+# Sort with custom key
+students = [('Alice', 85), ('Bob', 90), ('Charlie', 78)]
+sorted_by_grade = sorted(students, key=lambda x: x[1], reverse=True)
+
+# Sort strings by length
+words = ['python', 'java', 'c', 'javascript']
+sorted_by_length = sorted(words, key=len)
+```
+
+## Performance Comparison
+- **sorted()/.sort():** O(n log n) - Highly optimized (Timsort)
+- **Bubble Sort:** O(n²) - Good for learning, not practical
+- **Insertion Sort:** O(n²) - Efficient for small lists
+
+**Recommendation:** Use Python's built-in `sorted()` or `.sort()` for production code!"""
+        
         elif any(word in query_lower for word in ['algorithm', 'sorting', 'code']):
             return """# Programming Concepts & Algorithms
 
@@ -1325,6 +1409,10 @@ What creative project can I help you with?"""
         # 🌍 ENVIRONMENTAL & EARTH SCIENCE (Enhanced Detection)
         elif any(keyword in query_lower for keyword in ['climate change', 'global warming', 'water cycle', 'weather', 'atmosphere', 'ocean', 'geology', 'earthquake', 'volcano', 'environment', 'pollution', 'renewable energy']):
             return self._generate_detailed_environmental_response(query)
+        
+        # 🌌 ASTRONOMY & SPACE SCIENCE (Enhanced Detection)
+        elif any(keyword in query_lower for keyword in ['solar system', 'planets', 'sun', 'moon', 'stars', 'galaxy', 'universe', 'space', 'astronomy', 'telescope', 'mars', 'earth', 'jupiter', 'saturn', 'venus', 'mercury', 'uranus', 'neptune', 'pluto', 'asteroid', 'comet', 'black hole']):
+            return self._generate_detailed_astronomy_response(query)
         
         # 💻 TECHNOLOGY & COMPUTING (Enhanced Detection)
         elif any(keyword in query_lower for keyword in ['computer', 'internet', 'software', 'hardware', 'programming', 'code', 'algorithm', 'data', 'database', 'network', 'cybersecurity', 'blockchain', 'cryptocurrency', 'app', 'website', 'digital']):
@@ -2155,6 +2243,282 @@ Your question about **{query}** relates to important environmental processes and
 
 **Would you like me to focus on specific environmental aspects of this topic?**"""
 
+    def _generate_detailed_astronomy_response(self, query: str) -> str:
+        """Generate accurate astronomy and space science responses"""
+        query_lower = query.lower()
+        
+        if 'solar system' in query_lower:
+            return """# The Solar System: Our Cosmic Neighborhood
+
+## Overview
+The **Solar System** consists of the Sun and all celestial bodies orbiting it, including planets, moons, asteroids, comets, and other space debris.
+
+## The Sun
+- **Type:** G-type main-sequence star (yellow dwarf)
+- **Age:** Approximately 4.6 billion years old
+- **Mass:** 99.86% of the entire solar system's mass
+- **Temperature:** 5,778 K (5,505°C) surface temperature
+- **Energy Source:** Nuclear fusion of hydrogen into helium
+
+## The Eight Planets
+
+### Inner Planets (Terrestrial)
+#### 1. Mercury
+- **Distance from Sun:** 57.9 million km
+- **Day length:** 59 Earth days
+- **Year length:** 88 Earth days
+- **Features:** Extreme temperature variations, no atmosphere
+
+#### 2. Venus
+- **Distance from Sun:** 108.2 million km
+- **Day length:** 243 Earth days (retrograde rotation)
+- **Year length:** 225 Earth days
+- **Features:** Hottest planet, thick CO₂ atmosphere, extreme greenhouse effect
+
+#### 3. Earth
+- **Distance from Sun:** 149.6 million km (1 AU)
+- **Day length:** 24 hours
+- **Year length:** 365.25 days
+- **Features:** Only known planet with life, liquid water, protective atmosphere
+
+#### 4. Mars
+- **Distance from Sun:** 227.9 million km
+- **Day length:** 24.6 hours
+- **Year length:** 687 Earth days
+- **Features:** Red color from iron oxide, polar ice caps, evidence of ancient water
+
+### Outer Planets (Gas Giants)
+#### 5. Jupiter
+- **Distance from Sun:** 778.5 million km
+- **Day length:** 9.9 hours
+- **Year length:** 12 Earth years
+- **Features:** Largest planet, Great Red Spot, 95+ moons including Io, Europa
+
+#### 6. Saturn
+- **Distance from Sun:** 1.432 billion km
+- **Day length:** 10.7 hours
+- **Year length:** 29 Earth years
+- **Features:** Prominent ring system, 146+ moons including Titan
+
+#### 7. Uranus
+- **Distance from Sun:** 2.867 billion km
+- **Day length:** 17.2 hours (retrograde)
+- **Year length:** 84 Earth years
+- **Features:** Tilted 98°, faint rings, ice giant composition
+
+#### 8. Neptune
+- **Distance from Sun:** 4.515 billion km
+- **Day length:** 16.1 hours
+- **Year length:** 165 Earth years
+- **Features:** Windiest planet, deep blue color, largest moon Triton
+
+## Other Solar System Objects
+
+### Dwarf Planets
+- **Pluto:** Former 9th planet, now classified as dwarf planet
+- **Ceres:** Largest asteroid, located in asteroid belt
+- **Eris, Makemake, Haumea:** Trans-Neptunian objects
+
+### Asteroid Belt
+- **Location:** Between Mars and Jupiter
+- **Composition:** Rocky remnants from solar system formation
+- **Largest object:** Ceres (dwarf planet)
+
+### Kuiper Belt
+- **Location:** Beyond Neptune
+- **Objects:** Icy bodies including Pluto, comets
+- **Significance:** Remnants from early solar system
+
+### Oort Cloud
+- **Location:** Far outer edge of solar system
+- **Composition:** Icy objects, source of long-period comets
+- **Distance:** Up to 100,000 AU from Sun
+
+## Formation and Evolution
+- **Age:** ~4.6 billion years
+- **Formation:** Gravitational collapse of gas and dust cloud
+- **Early bombardment:** Heavy impacts shaped planetary surfaces
+- **Ongoing evolution:** Planetary migration, atmospheric changes
+
+## Exploration Achievements
+- **Robotic missions:** Voyager, Cassini, New Horizons, Mars rovers
+- **Human exploration:** Apollo moon landings
+- **Current missions:** Mars Perseverance, James Webb Space Telescope
+- **Future plans:** Artemis lunar program, Mars human missions
+
+The solar system continues to reveal its secrets through ongoing exploration and scientific discovery."""
+
+        elif 'planets' in query_lower:
+            return """# The Planets: Worlds Beyond Earth
+
+## Planet Classification
+
+### Terrestrial Planets (Rocky)
+**Mercury, Venus, Earth, Mars**
+- **Composition:** Rock and metal
+- **Size:** Smaller, higher density
+- **Atmosphere:** Thin to moderate
+- **Moons:** Few or none
+
+### Gas Giants
+**Jupiter, Saturn**
+- **Composition:** Hydrogen and helium
+- **Size:** Very large
+- **Atmosphere:** Thick, dynamic
+- **Moons:** Many (dozens to hundreds)
+
+### Ice Giants
+**Uranus, Neptune**
+- **Composition:** Water, methane, ammonia ices
+- **Size:** Medium-large
+- **Atmosphere:** Hydrogen, helium, methane
+- **Features:** Unique rotations and magnetic fields
+
+## Planetary Characteristics
+
+### Size Comparison (Diameter)
+1. **Jupiter:** 142,984 km (11.2× Earth)
+2. **Saturn:** 120,536 km (9.4× Earth)
+3. **Neptune:** 49,244 km (3.9× Earth)
+4. **Uranus:** 50,724 km (4.0× Earth)
+5. **Earth:** 12,756 km
+6. **Venus:** 12,104 km (0.95× Earth)
+7. **Mars:** 6,792 km (0.53× Earth)
+8. **Mercury:** 4,879 km (0.38× Earth)
+
+### Habitability Factors
+#### Goldilocks Zone
+- **Definition:** Distance range where liquid water can exist
+- **Current occupants:** Earth (perfect), Mars (edge)
+- **Factors:** Stellar radiation, atmospheric composition
+
+#### Atmospheric Requirements
+- **Pressure:** Sufficient for liquid water
+- **Composition:** Breathable gases, greenhouse effect
+- **Protection:** Magnetic field, ozone layer
+
+## Exoplanets: Planets Beyond Our Solar System
+- **Discovery methods:** Transit, radial velocity, direct imaging
+- **Types found:** Hot Jupiters, Super-Earths, Neptune-like
+- **Potentially habitable:** TRAPPIST-1 system, Kepler discoveries
+- **Future exploration:** James Webb Space Telescope observations
+
+Planetary science continues to expand our understanding of worlds both within and beyond our solar system."""
+
+        elif any(keyword in query_lower for keyword in ['stars', 'galaxy', 'universe']):
+            return """# Stars, Galaxies, and the Universe
+
+## Stars: Cosmic Powerhouses
+
+### Star Formation
+- **Stellar nurseries:** Nebulae (gas and dust clouds)
+- **Gravitational collapse:** Matter clumps under its own gravity
+- **Nuclear fusion begins:** Hydrogen → Helium reactions
+- **Main sequence:** Stable fusion phase (like our Sun)
+
+### Star Types
+#### By Size and Temperature
+- **Red dwarfs:** Small, cool, long-lived (trillions of years)
+- **Yellow dwarfs:** Medium, moderate (Sun-like, 10 billion years)
+- **Blue giants:** Large, hot, short-lived (millions of years)
+- **Red supergiants:** Massive, cool, brief but spectacular
+
+#### Stellar Evolution
+1. **Protostar:** Gravitational collapse begins
+2. **Main sequence:** Stable hydrogen fusion
+3. **Red giant:** Outer layers expand as fuel depletes
+4. **Final stages:** White dwarf, neutron star, or black hole
+
+## Galaxies: Island Universes
+
+### The Milky Way
+- **Type:** Barred spiral galaxy
+- **Diameter:** ~100,000 light-years
+- **Stars:** 200-400 billion stars
+- **Age:** ~13.6 billion years
+- **Our location:** Orion Arm, ~26,000 light-years from center
+
+### Galaxy Types
+#### Spiral Galaxies
+- **Structure:** Arms, bulge, halo
+- **Star formation:** Active in spiral arms
+- **Examples:** Milky Way, Andromeda
+
+#### Elliptical Galaxies
+- **Shape:** Oval to nearly circular
+- **Star formation:** Minimal
+- **Population:** Older, redder stars
+
+#### Irregular Galaxies
+- **Structure:** No defined shape
+- **Examples:** Large/Small Magellanic Clouds
+
+## The Universe: Everything That Exists
+
+### Scale and Structure
+- **Observable universe:** 93 billion light-years diameter
+- **Age:** 13.8 billion years since Big Bang
+- **Galaxies:** Estimated 2 trillion in observable universe
+- **Large-scale structure:** Cosmic web of filaments and voids
+
+### Cosmic Timeline
+1. **Big Bang:** Universe begins (13.8 billion years ago)
+2. **First stars:** Form from primordial hydrogen (13.5 billion years ago)
+3. **Galaxy formation:** Gravitational clustering (13+ billion years ago)
+4. **Solar system formation:** Our cosmic neighborhood (4.6 billion years ago)
+5. **Present day:** Continued expansion and evolution
+
+### Fundamental Forces
+- **Gravity:** Shapes large-scale structure
+- **Electromagnetic:** Governs atomic interactions
+- **Strong nuclear:** Holds atomic nuclei together
+- **Weak nuclear:** Enables radioactive decay
+
+### Dark Components
+- **Dark matter:** ~27% of universe, invisible but gravitationally active
+- **Dark energy:** ~68% of universe, drives accelerating expansion
+- **Ordinary matter:** ~5% of universe (everything we can see)
+
+## Current Mysteries
+- **Dark matter nature:** What particles compose it?
+- **Dark energy mechanism:** What causes cosmic acceleration?
+- **Multiverse theory:** Are there other universes?
+- **Life beyond Earth:** How common is life in the universe?
+
+Astronomy continues to reveal the magnificent scale and complexity of our cosmic home."""
+
+        else:
+            return f"""# Astronomy & Space Science: {query}
+
+## Cosmic Context
+Your question about **{query}** relates to fascinating aspects of astronomy and space science:
+
+### Scale of the Universe
+- **Local scale:** Solar system and nearby stars
+- **Galactic scale:** Milky Way galaxy structure
+- **Cosmic scale:** Observable universe and beyond
+- **Time scales:** From seconds to billions of years
+
+### Astronomical Objects
+- **Stellar objects:** Stars, brown dwarfs, stellar remnants
+- **Planetary systems:** Exoplanets and their characteristics
+- **Galactic structures:** Star clusters, nebulae, black holes
+- **Cosmological features:** Dark matter, dark energy
+
+### Observational Methods
+- **Ground-based telescopes:** Optical, radio, infrared
+- **Space telescopes:** Hubble, James Webb, Spitzer
+- **Space missions:** Robotic explorers and human spaceflight
+- **Future observations:** Next-generation instruments
+
+### Current Research Areas
+- **Exoplanet discovery:** Search for potentially habitable worlds
+- **Gravitational waves:** Ripples in spacetime
+- **Dark universe:** Understanding dark matter and energy
+- **Astrobiology:** Search for life beyond Earth
+
+**Would you like me to explore specific astronomical aspects of this topic?**"""
+
     def _generate_detailed_technology_response(self, query: str) -> str:
         """Generate accurate technology responses"""
         query_lower = query.lower()
@@ -2925,6 +3289,100 @@ https://www.example.com:80/path/to/page?param=value#section
 
 URLs are the universal addressing system of the Internet."""
 
+        elif any(acronym in query_lower for acronym in ['nasa', 'space agency']):
+            return """# NASA - National Aeronautics and Space Administration
+
+## Full Form
+**NASA** stands for **National Aeronautics and Space Administration**
+
+## What is NASA?
+**NASA** is the United States government agency responsible for civilian space program and aeronautics research.
+
+## History
+- **Founded:** July 29, 1958
+- **Predecessor:** NACA (National Advisory Committee for Aeronautics)
+- **First Achievement:** Mercury program (first Americans in space)
+
+## Major Programs
+- **Apollo Program:** Moon landing missions (1969-1972)
+- **Space Shuttle:** Reusable spacecraft program (1981-2011)
+- **International Space Station (ISS):** Ongoing space laboratory
+- **Mars Exploration:** Rovers and future human missions
+
+## Current Focus
+- **Artemis Program:** Return humans to the Moon
+- **Mars Exploration:** Perseverance rover and future missions
+- **James Webb Space Telescope:** Deep space observations
+- **Climate Research:** Earth observation and climate monitoring
+
+NASA continues to push the boundaries of space exploration and scientific discovery."""
+
+        elif any(acronym in query_lower for acronym in ['gpu', 'graphics processing']):
+            return """# GPU - Graphics Processing Unit
+
+## Full Form
+**GPU** stands for **Graphics Processing Unit**
+
+## What is a GPU?
+A **GPU** is a specialized processor designed to accelerate graphics rendering and parallel processing tasks.
+
+## Primary Functions
+- **Graphics Rendering:** Display visual content on screens
+- **Parallel Processing:** Handle multiple tasks simultaneously
+- **AI/ML Acceleration:** Machine learning and neural network training
+- **Cryptocurrency Mining:** Computational tasks for blockchain
+
+## GPU vs CPU
+### GPU Strengths:
+- **Parallel Processing:** Thousands of cores for simultaneous operations
+- **High Throughput:** Excellent for repetitive tasks
+- **Specialized Tasks:** Graphics, AI, scientific computing
+
+### CPU Strengths:
+- **Complex Instructions:** Better for sequential processing
+- **General Purpose:** Handles diverse computing tasks
+- **Lower Latency:** Faster single-threaded performance
+
+## Applications
+- **Gaming:** Real-time 3D graphics and visual effects
+- **AI/Machine Learning:** Training neural networks
+- **Video Editing:** Rendering and processing video content
+- **Scientific Computing:** Simulations and data analysis
+
+Modern GPUs are essential for high-performance computing and AI applications."""
+
+        elif any(acronym in query_lower for acronym in ['usb', 'universal serial']):
+            return """# USB - Universal Serial Bus
+
+## Full Form
+**USB** stands for **Universal Serial Bus**
+
+## What is USB?
+**USB** is a standard interface for connecting devices to computers and transferring data or power.
+
+## USB Versions & Speeds
+- **USB 1.0/1.1:** 1.5-12 Mbps (1996-1998)
+- **USB 2.0:** 480 Mbps (2000)
+- **USB 3.0:** 5 Gbps (2008)
+- **USB 3.1:** 10 Gbps (2013)
+- **USB 3.2:** 20 Gbps (2017)
+- **USB4:** 40 Gbps (2019)
+
+## USB Connector Types
+- **USB-A:** Standard rectangular connector
+- **USB-B:** Square connector (printers, external drives)
+- **USB-C:** Reversible oval connector (modern standard)
+- **Micro-USB:** Small connector (older phones)
+- **Mini-USB:** Compact connector (cameras, older devices)
+
+## Features
+- **Plug and Play:** Automatic device recognition
+- **Hot Swapping:** Connect/disconnect without restart
+- **Power Delivery:** Can charge devices
+- **Daisy Chaining:** Connect multiple devices
+
+USB revolutionized device connectivity with universal compatibility."""
+
         # Add more common acronyms
         elif any(acronym in query_lower for acronym in ['api', 'rest api']):
             return """# API - Application Programming Interface
@@ -2988,6 +3446,182 @@ APIs enable modern software integration and functionality."""
 - **Robotics:** Intelligent physical systems
 
 AI is transforming every industry and aspect of modern life."""
+
+        elif 'nasa' in query_lower:
+            return """# NASA - National Aeronautics and Space Administration
+
+## Full Form
+**NASA** stands for **National Aeronautics and Space Administration**
+
+## What is NASA?
+**NASA** is the United States government agency responsible for the civilian space program and for aeronautics and aerospace research.
+
+## Key Missions
+- **Space Exploration:** Mars rovers, Moon missions, International Space Station
+- **Earth Science:** Climate monitoring, weather satellites
+- **Aeronautics Research:** Advanced aircraft technologies
+- **Deep Space:** Hubble Space Telescope, James Webb Space Telescope
+
+## Famous Achievements
+- **Apollo 11:** First human moon landing (1969)
+- **Space Shuttle Program:** Reusable spacecraft (1981-2011)
+- **Mars Exploration:** Multiple successful rover missions
+- **ISS:** International cooperation in space
+
+## Current Projects
+- **Artemis Program:** Return humans to the Moon
+- **Mars Sample Return:** Bringing Martian samples to Earth
+- **James Webb Space Telescope:** Observing the early universe
+
+NASA continues to push the boundaries of human knowledge and space exploration."""
+
+        elif 'gpu' in query_lower:
+            return """# GPU - Graphics Processing Unit
+
+## Full Form
+**GPU** stands for **Graphics Processing Unit**
+
+## What is a GPU?
+A **GPU** is a specialized processor designed to accelerate graphics rendering and perform parallel computations efficiently.
+
+## Primary Functions
+- **Graphics Rendering:** Process visual data for displays
+- **Parallel Computing:** Handle thousands of operations simultaneously
+- **AI/Machine Learning:** Accelerate training and inference
+- **Scientific Computing:** Complex mathematical calculations
+
+## GPU vs CPU
+### GPU Strengths:
+- **Parallel Processing:** Thousands of cores for simultaneous operations
+- **High Throughput:** Excellent for repetitive tasks
+- **Specialized Tasks:** Graphics, AI, scientific computing
+
+### CPU Strengths:
+- **Complex Instructions:** Better for sequential processing
+- **General Purpose:** Handles diverse computing tasks
+- **Lower Latency:** Faster single-threaded performance
+
+## Applications
+- **Gaming:** Real-time 3D graphics rendering
+- **AI/ML:** Neural network training and inference
+- **Cryptocurrency:** Mining operations
+- **Video Editing:** Real-time video processing
+- **Scientific Research:** Climate modeling, physics simulations
+
+## Major Manufacturers
+- **NVIDIA:** GeForce, RTX, Quadro series
+- **AMD:** Radeon, RX series
+- **Intel:** Arc, integrated graphics
+
+GPUs have become essential for modern computing beyond just graphics."""
+
+        elif 'usb' in query_lower:
+            return """# USB - Universal Serial Bus
+
+## Full Form
+**USB** stands for **Universal Serial Bus**
+
+## What is USB?
+**USB** is a standard for connecting, communicating, and powering devices like computers, phones, and peripherals.
+
+## Key Features
+- **Universal:** Works with many different devices
+- **Hot-Pluggable:** Connect/disconnect without restarting
+- **Power Delivery:** Can charge devices while transferring data
+- **Standardized:** Common connector types across devices
+
+## USB Versions
+- **USB 1.1:** 12 Mbps (1998)
+- **USB 2.0:** 480 Mbps (2000)
+- **USB 3.0:** 5 Gbps (2008)
+- **USB 3.1:** 10 Gbps (2013)
+- **USB 3.2:** 20 Gbps (2017)
+- **USB4:** 40 Gbps (2019)
+
+## Connector Types
+- **USB-A:** Traditional rectangular connector
+- **USB-B:** Square connector for printers
+- **USB-C:** Reversible, modern standard
+- **Micro-USB:** Small devices, older phones
+- **Mini-USB:** Older small devices
+
+## Common Uses
+- **Data Transfer:** Files between devices
+- **Device Charging:** Phones, tablets, laptops
+- **Peripheral Connection:** Keyboards, mice, cameras
+- **Storage:** USB flash drives, external hard drives
+
+USB has revolutionized device connectivity and charging."""
+
+        elif any(word in query_lower for word in ['ram', 'random access memory']):
+            return """# RAM - Random Access Memory
+
+## Full Form
+**RAM** stands for **Random Access Memory**
+
+## What is RAM?
+**RAM** is the computer's short-term memory that stores data temporarily while the system is running.
+
+## Key Characteristics
+- **Volatile:** Data is lost when power is removed
+- **Fast Access:** Much faster than storage drives
+- **Random Access:** Any location can be accessed directly
+- **Temporary Storage:** Holds currently used programs and data
+
+## Types of RAM
+- **DDR4:** Current standard (2014-present)
+- **DDR5:** Latest generation (2020-present)
+- **LPDDR:** Low-power version for mobile devices
+- **ECC:** Error-correcting code for servers
+
+## How RAM Works
+1. **Program Loading:** OS loads programs from storage to RAM
+2. **Active Processing:** CPU accesses data directly from RAM
+3. **Multitasking:** Multiple programs share RAM space
+4. **Cache:** Frequently used data stays in RAM
+
+## RAM Capacity
+- **8GB:** Minimum for modern computers
+- **16GB:** Recommended for most users
+- **32GB+:** For professional work, gaming, servers
+
+More RAM allows for better multitasking and faster performance."""
+
+        elif 'ssd' in query_lower:
+            return """# SSD - Solid State Drive
+
+## Full Form
+**SSD** stands for **Solid State Drive**
+
+## What is an SSD?
+An **SSD** is a storage device that uses flash memory to store data, with no moving parts.
+
+## SSD vs HDD
+### SSD Advantages:
+- **Faster:** 10-100x faster than traditional hard drives
+- **Reliable:** No moving parts, less likely to fail
+- **Quiet:** Silent operation
+- **Energy Efficient:** Lower power consumption
+- **Compact:** Smaller form factors available
+
+### HDD Advantages:
+- **Cost:** Cheaper per gigabyte
+- **Capacity:** Available in larger sizes
+- **Longevity:** Well-established technology
+
+## Types of SSDs
+- **SATA SSD:** Uses SATA interface, up to 600 MB/s
+- **NVMe SSD:** Uses PCIe interface, up to 7000+ MB/s
+- **M.2 SSD:** Compact form factor
+- **External SSD:** Portable storage solution
+
+## Applications
+- **Boot Drive:** Faster system startup
+- **Gaming:** Reduced loading times
+- **Professional Work:** Video editing, large file handling
+- **Laptops:** Better battery life and durability
+
+SSDs have become the standard for modern computing storage."""
 
         # General acronym handler for unrecognized ones
         else:
