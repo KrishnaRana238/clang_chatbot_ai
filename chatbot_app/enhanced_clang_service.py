@@ -1444,7 +1444,7 @@ What creative project can I help you with?"""
         
         # 📚 EDUCATION & LEARNING (Enhanced Detection)
         elif any(keyword in query_lower for keyword in ['what is', 'define', 'explain', 'meaning', 'difference between', 'philosophy', 'education', 'learning', 'study', 'university', 'school']):
-            return self._generate_detailed_educational_response(query)
+            return self._generate_detailed_comprehensive_response(query)
         
         # 🔬 GENERAL SCIENCE (Catch remaining science questions)
         elif any(keyword in query_lower for keyword in ['how does', 'how do', 'why does', 'why do', 'what causes', 'science', 'scientific', 'research', 'experiment', 'theory']):
