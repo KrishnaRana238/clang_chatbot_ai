@@ -394,7 +394,9 @@ class EnhancedClangChatbot:
             }
         
         # AI/Technology/Knowledge questions fallback
-        if any(keyword in query_lower for keyword in ['what is artificial intelligence', 'artificial intelligence', 'machine learning', 'what is ai', 'explain ai', 'what is', 'explain', 'define', 'technology', 'computer science', 'neural networks']):
+        # BUT SKIP acronym questions (they should go to universal response)
+        if (any(keyword in query_lower for keyword in ['what is artificial intelligence', 'artificial intelligence', 'machine learning', 'what is ai', 'explain ai', 'technology', 'computer science', 'neural networks']) and 
+            not any(phrase in query_lower for phrase in ['full form', 'abbreviation', 'acronym', 'stands for'])):
             return {
                 'response': self._generate_ai_knowledge_response(query),
                 'sources': ['built_in_knowledge'],
