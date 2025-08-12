@@ -1440,7 +1440,7 @@ What creative project can I help you with?"""
         
         # � GEOGRAPHY & TRAVEL (Enhanced Detection)
         elif any(keyword in query_lower for keyword in ['geography', 'country', 'continent', 'city', 'capital', 'travel', 'culture', 'language', 'population', 'mountain', 'river', 'ocean']):
-            return self._generate_detailed_geography_response(query)
+            return self._generate_detailed_comprehensive_response(query)
         
         # 📚 EDUCATION & LEARNING (Enhanced Detection)
         elif any(keyword in query_lower for keyword in ['what is', 'define', 'explain', 'meaning', 'difference between', 'philosophy', 'education', 'learning', 'study', 'university', 'school']):
