@@ -1,0 +1,44 @@
+OpenAI library not installed. Install with: pip install openai
+Advanced LLM service not available
+✅ Conversation memory database initialized
+✅ Advanced Medical Service loaded
+✅ Essay Writing Service loaded
+✅ Emotional Intelligence Service loaded
+✅ Knowledge base database initialized
+✅ SpaCy NLP processor loaded
+✅ NLTK components initialized
+✅ Grammar checker initialized with TextBlob
+✅ Mathematical calculator initialized with SymPy
+✅ SpaCy NLP model loaded successfully
+✅ NLTK components initialized
+✅ Medical database initialized with comprehensive data
+🏥 Medical Knowledge Service initialized
+🚀 Using Multi-API with 4 provider(s):
+  1. Cohere API
+  2. Groq API
+  3. Mistral API
+  4. Together API
+🔑 Cohere API initialized
+✅ Chatbot initialized successfully with method: multi_api
+✅ Enhanced Clang 3.0 Simple initialized successfully
+✅ Conversation memory database initialized
+✅ Conversation memory system initialized
+✅ Enhanced Clang enabled for full AI responses
+🚀 Using Multi-API with 4 provider(s):
+  1. Cohere API
+  2. Groq API
+  3. Mistral API
+  4. Together API
+🔑 Cohere API initialized
+✅ Chatbot initialized successfully with method: multi_api
+✅ Fallback chatbot initialized with method: multi_api
+✅ Enhanced Clang enabled for full AI responses
+🚀 Using Multi-API with 4 provider(s):
+  1. Cohere API
+  2. Groq API
+  3. Mistral API
+  4. Together API
+🔑 Cohere API initialized
+✅ Chatbot initialized successfully with method: multi_api
+✅ Fallback chatbot initialized with method: multi_api
+[

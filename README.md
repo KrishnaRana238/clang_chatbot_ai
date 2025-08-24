@@ -1,3 +1,44 @@
+# PostgreSQL Setup & Data Migration on Render
+
+## 1. Add PostgreSQL Database in Render
+- Go to Render dashboard → New → Database → PostgreSQL.
+- Note your database name, user, password, host, and port.
+
+## 2. Set Environment Variables in Render
+- In your Render service settings, add:
+	- POSTGRES_DB
+	- POSTGRES_USER
+	- POSTGRES_PASSWORD
+	- POSTGRES_HOST
+	- POSTGRES_PORT
+
+## 3. Install PostgreSQL Driver
+- Ensure `psycopg2-binary` is in your `requirements.txt`.
+
+## 4. Migrate Django Data
+- Push code changes to Render.
+- On deploy, Django will run migrations automatically:
+	```
+	python manage.py migrate --noinput
+	```
+
+## 5. (Optional) Move Existing Data from SQLite to PostgreSQL
+- Locally, run:
+	```
+	python manage.py dumpdata > data.json
+	```
+- Change your local `settings.py` to use PostgreSQL.
+- Run migrations:
+	```
+	python manage.py migrate
+	```
+- Load data:
+	```
+	python manage.py loaddata data.json
+	```
+
+---
+This will set up PostgreSQL and migrate your Django data for Render deployment.
 # Enhanced Clang AI Assistant - Advanced Multi-Provider Chatbot with Emotional Intelligence
 
 🤖 **Clang** is a sophisticated AI assistant built with Django multi-provider API integration, emotional intelligence, and human-like conversational abilities.

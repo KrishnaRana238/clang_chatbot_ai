@@ -1,3 +1,10 @@
+# Usage for data migration:
+# Dump data from SQLite:
+#   python manage.py dumpdata > data.json
+# Change settings.py to use PostgreSQL, run migrations:
+#   python manage.py migrate
+# Load data into PostgreSQL:
+#   python manage.py loaddata data.json
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
 import os
