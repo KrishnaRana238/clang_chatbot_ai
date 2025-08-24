@@ -101,7 +101,9 @@ echo "📁 Collecting static files..."
 python manage.py collectstatic --noinput
 
 # Start gunicorn server
-echo "🌐 Starting Gunicorn server on port $PORT..."
+echo "🌐 DEBUG: About to start Gunicorn server on port $PORT..."
+ls -l
+env
 exec python -m gunicorn chatbot_project.wsgi:application \
     --bind 0.0.0.0:${PORT:-8000} \
     --workers 2 \
