@@ -527,6 +527,10 @@ class AdvancedMedicalService:
             return response
         
         return None
+    
+    def get_medical_response(self, query: str) -> str:
+        """Get medical response - this is the main method expected by views.py"""
+        return self.format_medical_response(query)
 
 # Global instance
 advanced_medical_service = AdvancedMedicalService()

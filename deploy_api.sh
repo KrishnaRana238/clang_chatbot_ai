@@ -33,7 +33,7 @@ cat > service_config.json << EOF
   "branch": "$BRANCH",
   "rootDir": ".",
   "buildCommand": "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate",
-  "startCommand": "gunicorn chatbot_project.wsgi:application --bind 0.0.0.0:\$PORT",
+  "startCommand": "./start_production.sh",
   "plan": "free",
   "region": "oregon",
   "envVars": [

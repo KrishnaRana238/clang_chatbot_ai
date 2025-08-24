@@ -374,6 +374,11 @@ class EssayWritingService:
             topic = topic.replace(keyword, '').strip()
         
         return topic if topic else 'general topic'
+    
+    def get_essay_response(self, query: str) -> str:
+        """Get essay response - this is the main method expected by views.py"""
+        topic = self.extract_essay_topic(query)
+        return self.generate_essay(topic)
 
 # Global instance
 essay_writing_service = EssayWritingService()

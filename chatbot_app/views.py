@@ -1,13 +1,18 @@
 import asyncio
 import traceback
+import uuid
+from datetime import datetime
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from .models import ChatSession, ChatMessage
 from .serializers import ChatMessageSerializer
 from .chatbot_service import OpenSourceChatbotService, ChainlitChatbotService
+from .ai_chatbot import ChatbotAI  # Import our new AI chatbot
 import json
 import logging
 
@@ -68,25 +73,14 @@ class ChatAPIView(APIView):
             'what is your name', "what's your name", 'who are you', 'what are you',
             'tell me about yourself', 'introduce yourself', 'your name'
         ]):
-            return """Hello! I'm **Clang**, your advanced AI assistant. I'm designed to help you with a wide range of tasks including medical queries, mathematical calculations, programming assistance, and general knowledge sharing. I can understand complex questions and provide detailed, accurate responses across multiple domains.
-
-*Created by Krishna* 🚀"""
+            return "I don't know about that. You may ask another question."
         
         # Simple greetings
         if message_lower in ['hey', 'hi', 'hello', 'good morning', 'good afternoon', 'good evening']:
-            return """Hey there! 👋 
-
-How can I help you today? I'm here to assist with:
-• Medical questions and health information
-• Mathematical calculations and problem solving  
-• Programming help and code assistance
-• General knowledge and research
-• Writing and creative tasks
-
-What would you like to explore?"""
+            return "I don't know about that. You may ask another question."
         
         # No trained response found
-        return None
+        return "I don't know about that. You may ask another question."
         if any(pattern in message_lower for pattern in [
             'what is your name', "what's your name", 'who are you', 'what are you',
             'tell me about yourself', 'introduce yourself', 'your name'
@@ -186,35 +180,39 @@ def api_test(request):
     
     # Test Cohere
     try:
-        import cohere
+    # import cohere  # Disabled: package not installed
         cohere_key = os.getenv('COHERE_API_KEY')
         if cohere_key:
-            client = cohere.Client(api_key=cohere_key)
-            response = client.generate(
-                model='command',
-                prompt='Hello',
-                max_tokens=5
-            )
-            results['cohere'] = {'status': 'success', 'response': str(response.generations[0].text)[:50]}
+            pass
+            # client = cohere.Client(api_key=cohere_key)  # Disabled: cohere not available
+            # response = client.generate(
+            #     model='command',
+            #     prompt='Hello',
+            #     max_tokens=5
+            # )
+            # results['cohere'] = {'status': 'success', 'response': str(response.generations[0].text)[:50]}
         else:
+            pass
             results['cohere'] = {'status': 'missing_key'}
     except Exception as e:
         results['cohere'] = {'status': 'error', 'error': str(e)[:100]}
     
     # Test Groq
     try:
-        from groq import Groq
+    # from groq import Groq  # Disabled: package not installed
         groq_key = os.getenv('GROQ_API_KEY')
         if groq_key:
-            client = Groq(api_key=groq_key)
-            response = client.chat.completions.create(
-                messages=[{"role": "user", "content": "Hello"}],
-                model="llama3-8b-8192",
-                max_tokens=5
-            )
-            results['groq'] = {'status': 'success', 'response': response.choices[0].message.content[:50]}
+            pass
+            # client = Groq(api_key=groq_key)  # Disabled: Groq not available
+            # response = client.chat.completions.create(
+            #     messages=[{"role": "user", "content": "Hello"}],
+            #     model="llama3-8b-8192",
+            #     max_tokens=5
+            # )
+            # results['groq'] = {'status': 'success', 'response': response.choices[0].message.content[:50]}
         else:
-            results['groq'] = {'status': 'missing_key'}
+            pass
+        results['groq'] = {'status': 'missing_key'}
     except Exception as e:
         results['groq'] = {'status': 'error', 'error': str(e)[:100]}
     
@@ -301,8 +299,8 @@ What would you like to explore?"""
     def handle_math_query(self, message):
         """Handle mathematical calculations quickly"""
         import re
-        import sympy as sp
-        from sympy import symbols, solve, diff, integrate, pi, sin, cos
+    # import sympy as sp  # Disabled: package not installed
+    # from sympy import symbols, solve, diff, integrate, pi, sin, cos  # Disabled: package not installed
         
         try:
             # Simple arithmetic patterns
@@ -988,6 +986,90 @@ What interests you most?"""
             print(f"Error in emotional response: {e}")
             return None
     
+    def _get_programming_fallback(self, message):
+        """Provide programming code fallback when AI is unavailable"""
+        message_lower = message.lower()
+        
+        # Python code templates
+        if 'python' in message_lower:
+            if 'factorial' in message_lower:
+                return """Here's Python code for factorial calculation:
+
+```python
+def factorial(n):
+    if n == 0 or n == 1:
+        return 1
+    else:
+        return n * factorial(n - 1)
+
+# Example usage
+number = 5
+result = factorial(number)
+print(f"Factorial of {number} is {result}")
+```
+
+This function uses recursion to calculate the factorial of a number."""
+            
+            elif 'prime' in message_lower:
+                return """Here's Python code to check for prime numbers:
+
+```python
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n**0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+# Example usage
+number = 17
+if is_prime(number):
+    print(f"{number} is a prime number")
+else:
+    print(f"{number} is not a prime number")
+```
+
+This function efficiently checks if a number is prime by testing divisibility up to its square root."""
+            
+            elif 'sort' in message_lower or 'bubble' in message_lower:
+                return """Here's Python code for bubble sort:
+
+```python
+def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr
+
+# Example usage
+numbers = [64, 34, 25, 12, 22, 11, 90]
+sorted_numbers = bubble_sort(numbers.copy())
+print(f"Original: {numbers}")
+print(f"Sorted: {sorted_numbers}")
+```
+
+Bubble sort compares adjacent elements and swaps them if they're in the wrong order."""
+        
+        # General programming fallback
+        return f"""I understand you're asking about programming: **"{message}"**
+
+While my AI services are temporarily unavailable, here are some quick suggestions:
+
+💻 **For Python Code:**
+• Check the official Python documentation at python.org
+• Try interactive coding at repl.it or CodePen
+• Look up examples on Stack Overflow
+
+🔧 **General Programming Help:**
+• Visit MDN Web Docs for JavaScript
+• Check language-specific documentation
+• Practice on coding platforms like LeetCode
+
+I'll provide detailed code assistance once my AI capabilities are fully restored! 🚀"""
+
     def get_intelligent_fallback_response(self, message):
         """Provide an intelligent fallback response for any query"""
         message_lower = message.lower().strip()
@@ -1149,90 +1231,55 @@ Please feel free to ask me anything! What would you like to know or discuss?""",
             else:
                 conversation_history = []
             
-            # Check for trained responses first
+            # Check for trained responses first (includes Clang identity)
             trained_response = self.get_trained_response(message)
             if trained_response:
                 bot_response = trained_response
+                print(f"🔍 DEBUG: Used trained response (identity/greeting)")
             else:
-                # Check for emotional/conversational response
-                emotional_response = self.get_emotional_response(message)
-                if emotional_response:
-                    bot_response = emotional_response
+                # Check medical dataset for a matching answer
+                try:
+                    from chatbot_app.medical_dataset_search import get_medical_response_from_dataset
+                    medical_answer = get_medical_response_from_dataset(message)
+                except Exception as e:
+                    print(f"Medical dataset search error: {e}")
+                    medical_answer = None
+                if medical_answer:
+                    bot_response = medical_answer
+                    print(f"🔍 DEBUG: Used medical dataset response")
                 else:
-                    # Check for medical response
-                    medical_response = self.get_medical_response(message)
-                    if medical_response:
-                        bot_response = medical_response
-                    else:
-                        # Check for essay response
-                        essay_response = self.get_essay_response(message)
-                        if essay_response:
-                            bot_response = essay_response
+                    # Use our new AI Chatbot for complex responses
+                    try:
+                        programming_words = ['code', 'python', 'javascript', 'programming', 'function', 'java', 'c++']
+                        essay_words = ['essay', 'write about', 'explain']
+                        print(f"🔍 DEBUG: Message = '{message}'")
+                        print(f"🔍 DEBUG: Message lower = '{message.lower()}'")
+                        print(f"🔍 DEBUG: Programming words = {programming_words}")
+                        print(f"🔍 DEBUG: Found programming words = {[w for w in programming_words if w in message.lower()]}")
+                        if any(word in message.lower() for word in programming_words):
+                            response_type = 'helpful'
+                            print(f"🔍 DEBUG: Detected as PROGRAMMING request")
+                        elif any(word in message.lower() for word in essay_words):
+                            response_type = 'essay'
+                            print(f"🔍 DEBUG: Detected as ESSAY request")
                         else:
-                            # Get bot response with AI processing (with asyncio timeout handling)
-                            try:
-                                if USE_ENHANCED_CLANG:
-                                    # Use enhanced Clang with asyncio timeout protection
-                                    try:
-                                        loop = asyncio.new_event_loop()
-                                        asyncio.set_event_loop(loop)
-                                        try:
-                                            print(f"🔍 Calling Enhanced Clang for: {message[:50]}...")
-                                            
-                                            # Use asyncio timeout instead of signal (thread-safe)
-                                            enhanced_result = loop.run_until_complete(
-                                                asyncio.wait_for(
-                                                    get_clang_response(message, conversation_history),
-                                                    timeout=30.0  # 30 second timeout for essay writing
-                                                )
-                                            )
-                                            
-                                            print(f"✅ Enhanced Clang returned: {type(enhanced_result)}")
-                                            if enhanced_result and 'response' in enhanced_result:
-                                                print(f"✅ Response type: {type(enhanced_result['response'])}")
-                                            else:
-                                                print("⚠️ Enhanced result missing response key")
-                                            
-                                            bot_response = enhanced_result['response']
-                                            
-                                            # Ensure response is not None - if it is, the enhanced service should have provided a fallback
-                                            if not bot_response:
-                                                # This shouldn't happen with the new intelligent fallback system
-                                                # but keep as safety net
-                                                bot_response = self.get_intelligent_fallback_response(message)
-                                            
-                                            # Add metadata for debugging (optional)
-                                            if hasattr(request, 'GET') and request.GET.get('debug'):
-                                                debug_info = f"\n\n🔍 **Debug Info:**\n"
-                                                debug_info += f"• Intent: {enhanced_result['metadata'].get('intent', 'unknown')}\n"
-                                                debug_info += f"• Confidence: {enhanced_result['metadata'].get('confidence', 0):.2f}\n"
-                                                debug_info += f"• Capabilities Used: {', '.join(enhanced_result['metadata'].get('capabilities_activated', []))}\n"
-                                                debug_info += f"• Processing Time: {enhanced_result['metadata'].get('processing_time_seconds', 0):.2f}s"
-                                                if bot_response:  # Check if bot_response is not None
-                                                    bot_response += debug_info
-                                        finally:
-                                            loop.close()
-                                    except asyncio.TimeoutError:
-                                        print("⚠️ AI processing timeout (30s), using fallback")
-                                        logging.warning(f"Enhanced Clang timed out after 30s for message: {message[:100]}")
-                                        bot_response = self.get_optimized_response(message, conversation_history)
-                                    except Exception as ai_error:
-                                        print(f"⚠️ AI processing error: {type(ai_error).__name__}: {ai_error}, using fallback")
-                                        logging.error(f"Enhanced Clang error: {type(ai_error).__name__}: {ai_error}")
-                                        logging.error(f"Full traceback: {traceback.format_exc()}")
-                                        bot_response = self.get_optimized_response(message, conversation_history)
-                                else:
-                                    # Use optimized fallback with quick pattern matching
-                                    bot_response = self.get_optimized_response(message, conversation_history)
-                                
-                                # Ensure we always have a valid response
-                                if not bot_response or bot_response.strip() == "":
-                                    bot_response = self.get_intelligent_fallback_response(message)
-                                    
-                            except Exception as e:
-                                print(f"Error getting bot response: {e}")
-                                # Provide an intelligent fallback response
-                                bot_response = self.get_intelligent_fallback_response(message)
+                            response_type = 'helpful'
+                            print(f"🔍 DEBUG: Detected as GENERAL request")
+                        print(f"🔍 DEBUG: Using response_type = '{response_type}'")
+                        print(f"🔍 DEBUG: Calling ChatbotAI.generate_response...")
+                        bot_response = ChatbotAI.generate_human_like_response(session_id, message, response_type)
+                        print(f"🔍 DEBUG: ChatbotAI returned {len(bot_response)} characters")
+                        print(f"🔍 DEBUG: Response preview: {bot_response[:100]}...")
+                    except TimeoutError:
+                        print(f"🔍 DEBUG: ChatbotAI timed out, using fallback")
+                        bot_response = self.get_intelligent_fallback_response(message)
+                    except Exception as e:
+                        print(f"AI Chatbot error: {e}")
+                        if any(word in message.lower() for word in ['code', 'python', 'javascript', 'programming', 'function', 'java', 'c++']):
+                            print(f"🔍 DEBUG: Using programming fallback for: {message}")
+                            bot_response = self._get_programming_fallback(message)
+                        else:
+                            bot_response = self.get_intelligent_fallback_response(message)
             
             # Save bot response
             bot_message = ChatMessage.objects.create(
@@ -1356,6 +1403,190 @@ class ChatSessionDetailView(APIView):
                 {'error': 'Session not found'}, 
                 status=status.HTTP_404_NOT_FOUND
             )
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class N8nWebhookView(APIView):
+    """Webhook endpoint for n8n integration with Enhanced Clang AI"""
+    
+    def post(self, request):
+        try:
+            # Parse request data
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+            else:
+                data = request.POST.dict()
+            
+            # Extract parameters
+            message = data.get('message', '')
+            session_id = data.get('session_id', f'n8n_{uuid.uuid4().hex[:8]}')
+            workflow_id = data.get('workflow_id', '')
+            automation_type = data.get('automation_type', 'general')
+            
+            # Validate input
+            if not message:
+                return JsonResponse({
+                    'success': False,
+                    'error': 'Message is required',
+                    'timestamp': datetime.now().isoformat()
+                }, status=400)
+            
+            # Enhanced context for n8n workflows
+            context = {
+                'workflow_id': workflow_id,
+                'automation_type': automation_type,
+                'previous_messages': data.get('context', []),
+                'user_profile': data.get('user_profile', {}),
+                'n8n_integration': True
+            }
+            
+            # Process with Enhanced Clang if available
+            start_time = datetime.now()
+            if USE_ENHANCED_CLANG:
+                try:
+                    # Enhanced message with n8n context
+                    enhanced_message = f"""
+Context: n8n {automation_type} automation workflow
+Workflow ID: {workflow_id}
+Previous context: {context['previous_messages'][-3:] if context['previous_messages'] else 'None'}
+User query: {message}
+"""
+                    response = get_clang_response(enhanced_message, session_id)
+                    service_used = "Enhanced Clang 3.0"
+                    
+                except Exception as e:
+                    print(f"Enhanced Clang error in n8n webhook: {e}")
+                    response = f"I'm experiencing technical difficulties. Error: {str(e)}"
+                    service_used = "Fallback"
+            else:
+                response = "Enhanced Clang service is not available for n8n integration."
+                service_used = "None"
+            
+            processing_time = (datetime.now() - start_time).total_seconds()
+            
+            # Generate workflow suggestions based on response
+            suggestions = self.generate_workflow_suggestions(response, automation_type)
+            
+            # Extract metadata for n8n processing
+            metadata = {
+                'message_length': len(message),
+                'response_length': len(response),
+                'processing_time': processing_time,
+                'service_used': service_used,
+                'automation_type': automation_type,
+                'has_code': '```' in response,
+                'has_links': 'http' in response.lower(),
+                'sentiment': self.analyze_sentiment(response),
+                'confidence': self.calculate_confidence(response)
+            }
+            
+            # Return structured response for n8n
+            return JsonResponse({
+                'success': True,
+                'response': response,
+                'session_id': session_id,
+                'workflow_id': workflow_id,
+                'context': context,
+                'suggestions': suggestions,
+                'metadata': metadata,
+                'timestamp': datetime.now().isoformat()
+            })
+            
+        except json.JSONDecodeError:
+            return JsonResponse({
+                'success': False,
+                'error': 'Invalid JSON in request body',
+                'timestamp': datetime.now().isoformat()
+            }, status=400)
+            
+        except Exception as e:
+            print(f"n8n webhook error: {e}")
+            return JsonResponse({
+                'success': False,
+                'error': str(e),
+                'timestamp': datetime.now().isoformat()
+            }, status=500)
+    
+    def generate_workflow_suggestions(self, response, automation_type):
+        """Generate workflow suggestions based on the response"""
+        suggestions = []
+        
+        # Code-related suggestions
+        if '```' in response:
+            suggestions.append({
+                'type': 'code_execution',
+                'description': 'Execute the generated code',
+                'confidence': 0.8
+            })
+            suggestions.append({
+                'type': 'code_review',
+                'description': 'Send code for review',
+                'confidence': 0.7
+            })
+        
+        # Link extraction suggestions
+        if 'http' in response.lower():
+            suggestions.append({
+                'type': 'link_processing',
+                'description': 'Extract and process URLs',
+                'confidence': 0.9
+            })
+        
+        # Document suggestions
+        if len(response) > 500:
+            suggestions.append({
+                'type': 'document_creation',
+                'description': 'Save response as document',
+                'confidence': 0.8
+            })
+        
+        # Automation-specific suggestions
+        if automation_type == 'customer_support':
+            suggestions.append({
+                'type': 'ticket_creation',
+                'description': 'Create support ticket',
+                'confidence': 0.7
+            })
+        elif automation_type == 'content_creation':
+            suggestions.append({
+                'type': 'content_publishing',
+                'description': 'Publish to content platforms',
+                'confidence': 0.8
+            })
+        
+        return suggestions
+    
+    def analyze_sentiment(self, text):
+        """Simple sentiment analysis for workflow routing"""
+        positive_words = ['good', 'great', 'excellent', 'amazing', 'wonderful', 'perfect']
+        negative_words = ['bad', 'terrible', 'awful', 'horrible', 'worst', 'hate']
+        
+        text_lower = text.lower()
+        positive_count = sum(1 for word in positive_words if word in text_lower)
+        negative_count = sum(1 for word in negative_words if word in text_lower)
+        
+        if positive_count > negative_count:
+            return 'positive'
+        elif negative_count > positive_count:
+            return 'negative'
+        else:
+            return 'neutral'
+    
+    def calculate_confidence(self, response):
+        """Calculate confidence score for the response"""
+        # Simple confidence calculation based on response characteristics
+        confidence = 0.5
+        
+        if len(response) > 100:
+            confidence += 0.2
+        if '```' in response:  # Has code
+            confidence += 0.1
+        if any(word in response.lower() for word in ['specifically', 'exactly', 'precisely']):
+            confidence += 0.1
+        if response.count('.') > 3:  # Well-structured
+            confidence += 0.1
+        
+        return min(confidence, 1.0)
 
 
 @api_view(['DELETE'])

@@ -215,7 +215,11 @@ class HumanInteractionOptimizer:
             ])
         
         # Add suggestions based on user interests
-        user_interests = user_context.get('profile', {}).get('interests', '')
+        user_interests = user_context.get('profile', {}).get('interests')
+        if not user_interests:
+            user_interests = []
+        elif isinstance(user_interests, str):
+            user_interests = [user_interests]
         if 'programming' in user_interests and message_type != 'code':
             suggestions.append("\n\n💻 *Since you're into programming, want to see how this relates to coding?*")
         

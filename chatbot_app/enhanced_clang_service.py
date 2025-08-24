@@ -111,16 +111,7 @@ class EnhancedClangService:
         
         # Greetings
         if any(greeting in query_lower for greeting in ['hello', 'hi', 'hey']):
-            return """Hey there! 👋 
-
-How can I help you today? I'm here to assist with:
-• Medical questions and health information
-• Mathematical calculations and problem solving  
-• Programming help and code assistance
-• General knowledge and research
-• Writing and creative tasks
-
-What would you like to explore?"""
+            return "I don't know about that. You may ask another question."
         
         # Simple arithmetic calculations
         arithmetic_match = re.search(r'(\d+)\s*([\+\-\*\/])\s*(\d+)', query)
@@ -234,9 +225,9 @@ Earth is the only known planet with life in the universe."""
                         return get_medical_information(query)
                 except Exception as e:
                     print(f"Medical service error: {e}")
-                    return "I can help with medical information. Please ask specific questions about symptoms, conditions, or treatments."
+                    return "I don't know about that. You may ask another question."
             else:
-                return "I can help with medical information. Please ask specific questions about symptoms, conditions, or treatments."
+                return "I don't know about that. You may ask another question."
         
         # Science questions
         if any(keyword in query_lower for keyword in ['photosynthesis', 'cell', 'dna']):
