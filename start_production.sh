@@ -106,11 +106,11 @@ ls -l
 env
 exec python -m gunicorn chatbot_project.wsgi:application \
     --bind 0.0.0.0:${PORT:-8000} \
-    --workers 2 \
+    --workers 1 \
     --worker-class sync \
-    --worker-connections 1000 \
-    --max-requests 1000 \
-    --max-requests-jitter 100 \
+    --worker-connections 100 \
+    --max-requests 100 \
+    --max-requests-jitter 50 \
     --timeout 30 \
     --keep-alive 2 \
     --log-level info \
