@@ -16,46 +16,7 @@ class DatasetTrainer:
         self.datasets = {}
         self.cached_responses = {}
         
-    def load_rstar_coder_dataset(self):
-        """Load Microsoft rStar-Coder dataset for coding responses"""
-        try:
-            print("🔄 Loading Microsoft rStar-Coder dataset...")
-            
-            # Load the dataset (requires HuggingFace login for this specific dataset)
-            ds = load_dataset("microsoft/rStar-Coder", "seed_sft", split="train[:1000]")  # Load first 1000 examples
-            
-            self.datasets['rstar_coder'] = ds
-            print(f"✅ Loaded {len(ds)} coding examples from rStar-Coder")
-            
-            # Cache some examples for quick responses
-            self._cache_coding_examples(ds)
-            
-            return True
-            
-        except Exception as e:
-            print(f"❌ Error loading rStar-Coder dataset: {e}")
-            print("💡 You may need to login with: huggingface-cli login")
-            return False
-    
-    def load_alternative_coding_dataset(self):
-        """Load alternative coding dataset if rStar-Coder is not available"""
-        try:
-            print("🔄 Loading alternative coding dataset...")
-            
-            # Use a publicly available coding dataset
-            ds = load_dataset("iamtarun/code_instructions_120k_alpaca", split="train[:1000]")
-            
-            self.datasets['coding_alternative'] = ds
-            print(f"✅ Loaded {len(ds)} coding examples from alternative dataset")
-            
-            # Cache examples
-            self._cache_alternative_coding_examples(ds)
-            
-            return True
-            
-        except Exception as e:
-            print(f"❌ Error loading alternative coding dataset: {e}")
-            return False
+    # Removed HuggingFace dataset loading for low-memory deployment
     
     def _cache_coding_examples(self, dataset):
         """Cache coding examples for quick responses"""
