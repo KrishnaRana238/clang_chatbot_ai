@@ -1,6 +1,12 @@
 from django.contrib import admin
 from .models import ChatSession, ChatMessage, MessageFeedback
 
+from .models import QAModel
+@admin.register(QAModel)
+class QAModelAdmin(admin.ModelAdmin):
+    list_display = ['question', 'answer']
+    search_fields = ['question', 'answer']
+
 
 @admin.register(ChatSession)
 class ChatSessionAdmin(admin.ModelAdmin):

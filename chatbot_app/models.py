@@ -1,3 +1,20 @@
+
+from django.db import models
+
+class QAModel(models.Model):
+    question = models.TextField(unique=True)
+    answer = models.TextField()
+
+    def __str__(self):
+        return self.question
+
+    @staticmethod
+    def get_answer_for_question(question):
+        try:
+            qa = QAModel.objects.get(question=question)
+            return qa.answer
+        except QAModel.DoesNotExist:
+            return None
 from django.db import models
 from django.contrib.auth.models import User
 
