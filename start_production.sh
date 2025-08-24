@@ -15,6 +15,7 @@ export PYTHONUNBUFFERED=1
 echo "📋 Environment Configuration:"
 echo "   Django Settings: $DJANGO_SETTINGS_MODULE"
 echo "   Debug Mode: $DEBUG"
+export PORT=${PORT:-8000}
 echo "   Port: $PORT"
 echo "   Python Path: $(which python)"
 echo "   Working Directory: $(pwd)"
